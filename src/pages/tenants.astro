@@ -1,0 +1,75 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import CopyButton from '../components/CopyButton.astro';
+import MaintenanceForm from '../components/MaintenanceForm.astro';
+import { site, phoneHref, managerName, mailingText } from '../config/site';
+
+const showOnline = site.features.onlineRentPayment && site.onlinePaymentUrl;
+---
+<Base title="Tenants" description={`Mail rent to ${site.mailing.poBox}, ${site.mailing.city}, ${site.mailing.state} ${site.mailing.zip} and send a maintenance request to ${managerName}.`}>
+  <PageHero id="tenants" eyebrow="For tenants" title="Rent and maintenance" lead="Everything you need to pay rent and get something fixed.">
+    <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+      <a href="#pay-rent" class="btn btn-glow">How to pay rent</a>
+      <a href="#maintenance" class="btn btn-line-light">Request maintenance</a>
+    </div>
+  </PageHero>
+
+  <section id="pay-rent" class="section" aria-labelledby="pay-title">
+    <div class="container-x grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+      <div>
+        <h2 id="pay-title" class="text-3xl sm:text-4xl">How to pay rent</h2>
+        <p class="mt-4 text-lg">Rent can be mailed to the address on the right. Use the copy button to grab it for an envelope or your bank's bill pay.</p>
+        <ul class="mt-6 space-y-3">
+          {site.rentPayableTo && (
+            <li class="flex gap-3"><Icon name="check" class="mt-1 h-5 w-5 shrink-0 text-shore" /><span>Make payments out to <strong>{site.rentPayableTo}</strong>.</span></li>
+          )}
+          {site.rentDueNote && (
+            <li class="flex gap-3"><Icon name="clock" class="mt-1 h-5 w-5 shrink-0 text-shore" /><span>{site.rentDueNote}</span></li>
+          )}
+          <li class="flex gap-3"><Icon name="info" class="mt-1 h-5 w-5 shrink-0 text-shore" /><span>Not sure what to include with your payment? Call <a href={phoneHref} class="font-semibold text-lake underline">{managerName} at {site.phone}</a>.</span></li>
+        </ul>
+      </div>
+
+      <div class="space-y-5">
+        <div class="card p-7 md:p-9">
+          <p class="font-semibold text-muted">Mail rent to</p>
+          <address class="mt-2 not-italic font-display text-2xl font-bold leading-snug text-lake sm:text-3xl">
+            {site.name}<br />{site.mailing.poBox}<br />{site.mailing.city}, {site.mailing.state} {site.mailing.zip}
+          </address>
+          <p class="mt-6"><CopyButton text={mailingText} class="btn btn-lake w-full sm:w-auto" /></p>
+        </div>
+
+        {showOnline && (
+          <div class="card-mist p-7">
+            <h3 class="text-2xl">Pay online</h3>
+            <p class="mt-1">You can also pay rent online.</p>
+            <a href={site.onlinePaymentUrl!} class="btn btn-glow mt-4" rel="noopener noreferrer" target="_blank">Pay rent online</a>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section id="maintenance" class="section bg-mist" aria-labelledby="maint-title">
+    <div class="container-x">
+      <div class="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
+        <div>
+          <h2 id="maint-title" class="text-3xl sm:text-4xl">Request maintenance</h2>
+          <p class="mt-4 text-lg">Tell us what is wrong and when to reach you. Your request goes to {managerName}.</p>
+          <div class="mt-6 rounded-2xl border-2 border-glow bg-[#FFF6E0] p-5">
+            <p class="flex items-center gap-2 font-display text-lg font-bold text-ink"><Icon name="alert" class="h-5 w-5" /> In an emergency</p>
+            <p class="mt-1">If anyone is in danger, call 911 first.</p>
+          </div>
+          <div class="card mt-5 p-6">
+            <p class="font-display text-lg font-bold text-lake">Prefer to call?</p>
+            <a href={phoneHref} class="mt-1 inline-block py-1 font-display text-3xl font-bold text-lake">{site.phone}</a>
+            <p class="text-sm text-muted">{managerName} takes questions, concerns and maintenance calls.</p>
+          </div>
+        </div>
+        <MaintenanceForm />
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,93 @@
+---
+/**
+ * Summit and lake contour art. Lines draw in once on load (CSS, see global.css).
+ * Reduced motion shows the finished drawing with no animation.
+ */
+import { summitRings, lakeShape, lakeOutlines, wave } from '../lib/contours';
+
+interface Props {
+  id: string;
+  cx?: number;
+  cy?: number;
+  rings?: number;
+  lake?: boolean;
+  class?: string;
+}
+const { id, cx = 880, cy = 300, rings = 13, lake = true, class: cls = '' } = Astro.props;
+
+const rs = summitRings(cx, cy, rings);
+const lakeD = lake ? lakeShape() : '';
+const outlines = lake ? lakeOutlines() : [];
+const ripples = lake
+  ? [
+      { y: 610, amp: 5, x0: -240 },
+      { y: 640, amp: 6, x0: -260 },
+      { y: 672, amp: 6, x0: -220 },
+      { y: 705, amp: 7, x0: -250 },
+    ]
+  : [];
+---
+<svg
+  class={`contours ${cls}`}
+  viewBox="0 0 1200 700"
+  preserveAspectRatio="xMaxYMid slice"
+  fill="none"
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <radialGradient id={`${id}-glow`} cx={cx} cy={cy} r="400" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="var(--glow)" stop-opacity="0.34" />
+      <stop offset="1" stop-color="var(--glow)" stop-opacity="0" />
+    </radialGradient>
+    {lake && (
+      <>
+        <linearGradient id={`${id}-water`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="var(--shore)" stop-opacity="0.55" />
+          <stop offset="1" stop-color="var(--lake)" stop-opacity="0.9" />
+        </linearGradient>
+        <clipPath id={`${id}-clip`}><path d={lakeD} /></clipPath>
+      </>
+    )}
+  </defs>
+
+  <circle class="fade-in" style="--d:200ms" cx={cx} cy={cy} r="400" fill={`url(#${id}-glow)`} />
+
+  <g stroke="var(--sky)" stroke-linecap="round" stroke-linejoin="round">
+    {rs.map((ring, i) => (
+      <path
+        class="draw"
+        style={`--i:${i}`}
+        d={ring.d}
+        pathLength="1"
+        stroke-width={ring.index ? 1.7 : 1}
+        stroke-opacity={ring.index ? 0.5 : 0.26}
+      />
+    ))}
+  </g>
+
+  <circle class="fade-in" style={`--d:${rings * 110 + 300}ms`} cx={cx} cy={cy} r="5" fill="var(--glow)" />
+
+  {lake && (
+    <g>
+      <path class="fade-in" style="--d:900ms" d={lakeD} fill={`url(#${id}-water)`} />
+      <path class="draw" style={`--i:${rings}`} d={lakeD} pathLength="1" stroke="var(--sky)" stroke-opacity="0.55" stroke-width="1.6" />
+      {outlines.map((d, i) => (
+        <path class="draw" style={`--i:${rings + 1 + i}`} d={d} pathLength="1" stroke="var(--sky)" stroke-opacity={0.3 - i * 0.07} stroke-width="1" />
+      ))}
+      <g clip-path={`url(#${id}-clip)`}>
+        <g class="ripples fade-in" style="--d:1500ms" stroke="var(--sky)" stroke-opacity="0.32" stroke-width="1.2" stroke-linecap="round">
+          {ripples.map((r) => (
+            <path d={wave(r.x0, 1500, r.y, r.amp, 90)} />
+          ))}
+        </g>
+        <g class="fade-in" style="--d:1700ms" stroke="var(--glow)" stroke-linecap="round">
+          <path d={`M${cx - 70} 598h140`} stroke-width="2" stroke-opacity="0.6" />
+          <path d={`M${cx - 52} 626h104`} stroke-width="2" stroke-opacity="0.45" />
+          <path d={`M${cx - 36} 654h72`} stroke-width="2" stroke-opacity="0.32" />
+          <path d={`M${cx - 20} 682h40`} stroke-width="2" stroke-opacity="0.22" />
+        </g>
+      </g>
+    </g>
+  )}
+</svg>

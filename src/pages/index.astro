@@ -1,0 +1,133 @@
+---
+import Base from '../layouts/Base.astro';
+import Announcement from '../components/Announcement.astro';
+import Contours from '../components/Contours.astro';
+import Icon from '../components/Icon.astro';
+import CopyButton from '../components/CopyButton.astro';
+import { site, phoneHref, managerName, mailingText } from '../config/site';
+
+const pillars = [
+  { icon: 'phone', title: 'Responsive', text: 'You always know who to call and where to send a request.' },
+  { icon: 'key', title: 'Reliable', text: 'One clear place for rent instructions and contact details.' },
+  { icon: 'shield', title: 'Safe and comfortable', text: 'The standard we aim for in every home in the building.' },
+  { icon: 'wrench', title: 'Well maintained', text: 'Maintenance requests have a simple home online.' },
+] as const;
+---
+<Base description={`${site.name} now manages your building in ${site.city}, ${site.state}. Pay rent, request maintenance and reach ${managerName} at ${site.phone}.`}>
+  <Announcement slot="announcement" />
+
+  <!-- Hero -->
+  <section class="on-dark hero-bg relative isolate overflow-hidden text-white">
+    <Contours id="home" class="absolute inset-0 -z-10 h-full w-full" />
+    <div class="container-x grid items-center gap-10 py-16 md:py-24 lg:grid-cols-[1.25fr_0.75fr] lg:py-32">
+      <div>
+        <p class="eyebrow text-glow">New management, effective immediately</p>
+        <h1 class="mt-5 text-[2.6rem] text-white sm:text-6xl lg:text-7xl">Your building has new management</h1>
+        <p class="mt-6 max-w-xl text-lg text-sky md:text-xl">
+          {site.name} now manages your building in {site.city}. Our goal is simple: {site.goal.charAt(0).toLowerCase() + site.goal.slice(1)}
+        </p>
+        <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+          <a href={phoneHref} class="btn btn-glow">
+            <Icon name="phone" class="h-5 w-5" />
+            Call {managerName} {site.phone}
+          </a>
+          <a href="/tenants" class="btn btn-line-light">Pay rent or request maintenance</a>
+        </div>
+      </div>
+
+      <aside class="glass rounded-3xl p-6 md:p-7" aria-labelledby="who-to-call">
+        <h2 id="who-to-call" class="text-2xl text-white">Who to call</h2>
+        <p class="mt-1 text-sky">For questions, concerns, maintenance or other matters, contact {managerName}.</p>
+        <a href={phoneHref} class="mt-4 inline-block py-1 font-display text-3xl font-bold text-glow sm:text-4xl">{site.phone}</a>
+        <p class="mt-4 border-t border-white/15 pt-4 text-sm text-sky">In an emergency, call 911 first.</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- What tenants need to know -->
+  <section class="section bg-mist" aria-labelledby="know">
+    <div class="container-x">
+      <div class="reveal max-w-2xl">
+        <h2 id="know" class="text-3xl sm:text-4xl md:text-5xl">What tenants need to know</h2>
+        <p class="mt-4 text-lg">Three things to keep handy while we settle in.</p>
+      </div>
+
+      <div class="mt-10 grid gap-5 md:grid-cols-3">
+        <article class="card reveal p-7">
+          <span class="grid h-12 w-12 place-items-center rounded-2xl bg-lake text-white"><Icon name="home" /></span>
+          <h3 class="mt-5 text-2xl">Who manages your building</h3>
+          <p class="mt-2">
+            {site.name}, a property management company in {site.city}, {site.state}. The building is now under new management, effective immediately.
+          </p>
+          {site.unitCount !== null && <p class="mt-2 font-semibold">{site.unitCount} homes under our care.</p>}
+        </article>
+
+        <article class="card reveal p-7">
+          <span class="grid h-12 w-12 place-items-center rounded-2xl bg-lake text-white"><Icon name="mail" /></span>
+          <h3 class="mt-5 text-2xl">Where rent goes</h3>
+          <p class="mt-2">Rent can be mailed to:</p>
+          <address class="mt-2 not-italic font-semibold text-lake">
+            {site.mailing.poBox}<br />{site.mailing.city}, {site.mailing.state} {site.mailing.zip}
+          </address>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <CopyButton text={mailingText} class="btn btn-line !min-h-[48px] !px-5" />
+            <a href="/tenants#pay-rent" class="btn !min-h-[48px] !px-4 text-lake underline">How to pay</a>
+          </div>
+        </article>
+
+        <article class="card reveal p-7">
+          <span class="grid h-12 w-12 place-items-center rounded-2xl bg-lake text-white"><Icon name="phone" /></span>
+          <h3 class="mt-5 text-2xl">Who to call</h3>
+          <p class="mt-2">For questions, concerns, maintenance or other matters, contact {managerName}.</p>
+          <a href={phoneHref} class="btn btn-lake mt-4 w-full sm:w-auto">
+            <Icon name="phone" class="h-5 w-5" />
+            {site.phone}
+          </a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Commitment -->
+  <section class="on-dark relative isolate overflow-hidden bg-lake text-white section" aria-labelledby="commitment">
+    <Contours id="commit" class="absolute inset-0 -z-10 h-full w-full opacity-60" lake={false} cx={200} cy={420} rings={10} />
+    <div class="container-x">
+      <div class="reveal max-w-3xl">
+        <p class="eyebrow text-glow">Our commitment</p>
+        <h2 id="commitment" class="mt-4 text-3xl text-white sm:text-4xl md:text-5xl">{site.goal}</h2>
+      </div>
+      <ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {pillars.map((p) => (
+          <li class="glass reveal rounded-3xl p-6">
+            <span class="grid h-11 w-11 place-items-center rounded-full bg-glow text-ink"><Icon name={p.icon} class="h-5 w-5" /></span>
+            <h3 class="mt-4 text-xl text-white">{p.title}</h3>
+            <p class="mt-1 text-[0.97rem] text-sky">{p.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Next steps -->
+  <section class="section" aria-labelledby="next">
+    <div class="container-x">
+      <h2 id="next" class="reveal text-3xl sm:text-4xl md:text-5xl">What would you like to do?</h2>
+      <div class="mt-10 grid gap-5 md:grid-cols-2">
+        <a href="/tenants#maintenance" class="card reveal group flex items-start gap-5 p-7 no-underline transition hover:-translate-y-1">
+          <span class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-glow text-ink"><Icon name="wrench" class="h-7 w-7" /></span>
+          <span>
+            <span class="block font-display text-2xl font-bold text-lake">Request maintenance</span>
+            <span class="mt-1 block text-ink">Tell us what is wrong and the best time to reach you.</span>
+          </span>
+        </a>
+        <a href="/vacancies" class="card reveal group flex items-start gap-5 p-7 no-underline transition hover:-translate-y-1">
+          <span class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-sky text-lake"><Icon name="home" class="h-7 w-7" /></span>
+          <span>
+            <span class="block font-display text-2xl font-bold text-lake">Looking for a home?</span>
+            <span class="mt-1 block text-ink">See current vacancies, then apply when you are ready.</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>

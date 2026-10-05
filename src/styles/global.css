@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Brand colors. Swap these seven values to rebrand the whole site. */
+:root {
+  --lake: #0F3B4C;
+  --deep: #0A2A37;
+  --shore: #2E7D8C;
+  --mist: #E8F1F3;
+  --sky: #CFE5EA;
+  --ink: #10262E;
+  --glow: #F2B544;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 5rem;
+  }
+  body {
+    @apply bg-white font-sans text-ink antialiased;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+  h1, h2, h3 {
+    @apply font-display text-lake;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+    text-wrap: balance;
+  }
+  a { text-underline-offset: 3px; }
+  :focus-visible {
+    outline: 3px solid var(--lake);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  .on-dark :focus-visible { outline-color: var(--glow); }
+  ::selection { background: var(--glow); color: var(--ink); }
+}
+
+@layer components {
+  .container-x { @apply mx-auto w-full max-w-6xl px-5 md:px-8; }
+  .section { @apply py-16 md:py-24; }
+
+  .btn {
+    @apply inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full px-6 text-base font-semibold transition duration-200;
+    text-decoration: none;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-glow { @apply bg-glow text-ink; }
+  .btn-glow:hover { filter: brightness(1.06); box-shadow: 0 8px 24px -8px var(--glow); }
+  .btn-lake { @apply bg-lake text-white; }
+  .btn-lake:hover { @apply bg-deep; }
+  .btn-line { @apply border-2 border-lake bg-transparent text-lake; }
+  .btn-line:hover { @apply bg-lake text-white; }
+  .btn-line-light { @apply border-2 border-sky text-white; }
+  .btn-line-light:hover { background: color-mix(in srgb, var(--sky) 18%, transparent); }
+
+  .card { @apply rounded-3xl border border-sky bg-white; box-shadow: 0 1px 0 var(--sky), 0 18px 40px -28px var(--lake); }
+  .card-mist { @apply rounded-3xl bg-mist; }
+  .eyebrow { @apply inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-sm font-semibold; background: color-mix(in srgb, var(--glow) 22%, transparent); }
+
+  .nav-link { @apply inline-flex min-h-[44px] items-center rounded-full px-4 text-[0.97rem] font-medium text-ink transition; text-decoration: none; }
+  .nav-link:hover { @apply bg-mist text-lake; }
+  .nav-link[aria-current='page'] { @apply bg-lake text-white; }
+  .mobile-link { @apply flex min-h-[52px] items-center rounded-xl px-3 text-lg font-medium text-ink; text-decoration: none; }
+  .mobile-link[aria-current='page'] { @apply bg-mist font-semibold text-lake; }
+
+  .label { @apply mb-1.5 block text-[0.97rem] font-semibold text-ink; }
+  .hint { @apply mt-1 block text-sm text-muted; }
+  .input {
+    @apply block min-h-[52px] w-full rounded-2xl border-2 border-sky bg-white px-4 py-3 text-base text-ink transition;
+  }
+  .input:hover { border-color: var(--shore); }
+  .input:focus { outline: none; border-color: var(--lake); box-shadow: 0 0 0 4px var(--sky); }
+  .input[aria-invalid='true'] { border-color: #B3261E; }
+  .field-error { @apply mt-1.5 text-sm font-semibold; color: #B3261E; }
+
+  .prose-sl p + p { @apply mt-4; }
+}
+
+/* Contour art: draw in once, stagger outward. Reduced motion gets the finished art. */
+.contours .draw,
+.contours .fade-in { stroke-dashoffset: 0; opacity: 1; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .contours .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 2.6s cubic-bezier(0.22, 0.7, 0.2, 1) forwards;
+    animation-delay: calc(var(--i, 0) * 110ms + 150ms);
+  }
+  .contours .fade-in {
+    opacity: 0;
+    animation: fade 1.4s ease-out forwards;
+    animation-delay: var(--d, 0ms);
+  }
+  .contours .ripples { animation: fade 1.4s ease-out forwards var(--d, 0ms), drift 14s linear infinite 1.5s; }
+
+  .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .js .reveal.is-visible { opacity: 1; transform: none; }
+}
+
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes fade { to { opacity: 1; } }
+@keyframes drift { from { transform: translateX(0); } to { transform: translateX(-90px); } }
+
+.hero-bg { background: linear-gradient(180deg, var(--deep) 0%, #0c3140 55%, var(--lake) 100%); }
+.glass { background: color-mix(in srgb, var(--deep) 72%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgb(255 255 255 / 0.16); }
+
+/* Honeypot: off screen, not display none, so simple bots still fill it. */
+.hp { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+
+.skip-link { position: absolute; left: 1rem; top: -4rem; z-index: 100; background: var(--glow); color: var(--ink); padding: 0.75rem 1.25rem; border-radius: 999px; font-weight: 600; }
+.skip-link:focus { top: 1rem; }

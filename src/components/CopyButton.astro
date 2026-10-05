@@ -1,0 +1,50 @@
+---
+import Icon from './Icon.astro';
+interface Props { text: string; label?: string; class?: string; }
+const { text, label = 'Copy address', class: cls = 'btn btn-line' } = Astro.props;
+---
+<button type="button" class={cls} data-copy={text} data-label={label}>
+  <span data-icon-copy><Icon name="copy" class="h-5 w-5" /></span>
+  <span data-icon-done hidden><Icon name="check" class="h-5 w-5" /></span>
+  <span data-copy-label>{label}</span>
+</button>
+<span class="sr-only" role="status" aria-live="polite" data-copy-status></span>
+
+<script>
+  async function copyText(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+      document.body.appendChild(ta);
+      ta.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch { ok = false; }
+      ta.remove();
+      return ok;
+    }
+  }
+
+  document.addEventListener('click', async (e) => {
+    const btn = (e.target as Element).closest<HTMLButtonElement>('button[data-copy]');
+    if (!btn) return;
+    const label = btn.querySelector('[data-copy-label]')!;
+    const status = btn.nextElementSibling as HTMLElement | null;
+    const ok = await copyText(btn.dataset.copy ?? '');
+    const done = ok ? 'Copied' : 'Copy failed, select the address instead';
+    label.textContent = done;
+    if (status) status.textContent = done;
+    btn.querySelector('[data-icon-copy]')!.toggleAttribute('hidden', ok);
+    btn.querySelector('[data-icon-done]')!.toggleAttribute('hidden', !ok);
+    setTimeout(() => {
+      label.textContent = btn.dataset.label ?? 'Copy address';
+      if (status) status.textContent = '';
+      btn.querySelector('[data-icon-copy]')!.removeAttribute('hidden');
+      btn.querySelector('[data-icon-done]')!.setAttribute('hidden', '');
+    }, 2200);
+  });
+</script>

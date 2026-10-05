@@ -1,0 +1,67 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import CopyButton from '../components/CopyButton.astro';
+import { site, phoneHref, managerName, mailingText } from '../config/site';
+---
+<Base title="Contact" description={`Contact ${managerName} at ${site.phone}. Rent can be mailed to ${site.mailing.poBox}, ${site.mailing.city}, ${site.mailing.state} ${site.mailing.zip}.`}>
+  <PageHero id="contact" eyebrow="Contact" title={`Reach ${managerName}`} lead={`For questions, concerns, maintenance or other matters, contact ${managerName} directly.`} />
+
+  <section class="section">
+    <div class="container-x grid gap-6 lg:grid-cols-2">
+      <article class="card p-7 md:p-9">
+        <span class="grid h-12 w-12 place-items-center rounded-2xl bg-glow text-ink"><Icon name="phone" /></span>
+        <h2 class="mt-5 text-3xl">Call {managerName}</h2>
+        <p class="mt-2">Questions, concerns, maintenance or other matters.</p>
+        <a href={phoneHref} class="mt-4 inline-block py-1 font-display text-4xl font-bold text-lake sm:text-5xl">{site.phone}</a>
+        <p class="mt-5"><a href={phoneHref} class="btn btn-lake w-full sm:w-auto"><Icon name="phone" class="h-5 w-5" />Call now</a></p>
+        <p class="mt-5 text-sm text-muted">In an emergency, call 911 first.</p>
+      </article>
+
+      <article class="card p-7 md:p-9">
+        <span class="grid h-12 w-12 place-items-center rounded-2xl bg-lake text-white"><Icon name="mail" /></span>
+        <h2 class="mt-5 text-3xl">Mailing address</h2>
+        <p class="mt-2">Rent can be mailed to:</p>
+        <address class="mt-3 not-italic font-display text-2xl font-bold leading-snug text-lake">
+          {site.name}<br />{site.mailing.poBox}<br />{site.mailing.city}, {site.mailing.state} {site.mailing.zip}
+        </address>
+        <p class="mt-5"><CopyButton text={mailingText} class="btn btn-line w-full sm:w-auto" /></p>
+      </article>
+
+      {site.email && (
+        <article class="card p-7 md:p-9">
+          <span class="grid h-12 w-12 place-items-center rounded-2xl bg-sky text-lake"><Icon name="mail" /></span>
+          <h2 class="mt-5 text-3xl">Email</h2>
+          <a href={`mailto:${site.email}`} class="mt-3 inline-block py-1 text-xl font-semibold text-lake">{site.email}</a>
+        </article>
+      )}
+
+      {site.buildingAddresses && site.buildingAddresses.length > 0 && (
+        <article class="card p-7 md:p-9">
+          <span class="grid h-12 w-12 place-items-center rounded-2xl bg-sky text-lake"><Icon name="pin" /></span>
+          <h2 class="mt-5 text-3xl">{site.buildingAddresses.length > 1 ? 'Buildings' : 'Building'}</h2>
+          <ul class="mt-3 space-y-1">{site.buildingAddresses.map((a) => <li>{a}</li>)}</ul>
+        </article>
+      )}
+
+      {site.officeHours && (
+        <article class="card p-7 md:p-9">
+          <span class="grid h-12 w-12 place-items-center rounded-2xl bg-sky text-lake"><Icon name="clock" /></span>
+          <h2 class="mt-5 text-3xl">Office hours</h2>
+          <p class="mt-3">{site.officeHours}</p>
+        </article>
+      )}
+    </div>
+
+    <div class="container-x mt-10">
+      <div class="card-mist flex flex-col items-start justify-between gap-5 p-7 md:flex-row md:items-center md:p-9">
+        <div>
+          <h2 class="text-2xl md:text-3xl">Something needs fixing?</h2>
+          <p class="mt-1">Send a maintenance request online, or call {managerName}.</p>
+        </div>
+        <a href="/tenants#maintenance" class="btn btn-lake shrink-0">Request maintenance</a>
+      </div>
+    </div>
+  </section>
+</Base>

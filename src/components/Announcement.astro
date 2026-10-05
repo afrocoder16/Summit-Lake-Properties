@@ -1,0 +1,15 @@
+---
+import { site } from '../config/site';
+import Icon from './Icon.astro';
+const a = site.announcement;
+---
+{a && (
+  <div class="bg-glow text-ink" role="region" aria-label="Announcement">
+    <div class="container-x flex flex-wrap items-center justify-center gap-x-3 gap-y-1 py-3 text-center text-[0.95rem] font-medium">
+      <p class="flex items-start gap-2"><Icon name="sparkle" class="mt-0.5 h-5 w-5 shrink-0" /><span>{a.message}</span></p>
+      {a.linkLabel && a.linkHref && (
+        <a href={a.linkHref} class="font-semibold underline underline-offset-4">{a.linkLabel}</a>
+      )}
+    </div>
+  </div>
+)}

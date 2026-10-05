@@ -1,0 +1,14 @@
+---
+import Contours from './Contours.astro';
+interface Props { id: string; eyebrow?: string; title: string; lead?: string; }
+const { id, eyebrow, title, lead } = Astro.props;
+---
+<section class="on-dark hero-bg relative isolate overflow-hidden text-white">
+  <Contours id={id} class="absolute inset-0 -z-10 h-full w-full" lake={false} cx={960} cy={250} rings={9} />
+  <div class="container-x py-14 md:py-20">
+    {eyebrow && <p class="eyebrow text-glow">{eyebrow}</p>}
+    <h1 class="mt-4 max-w-3xl text-4xl text-white sm:text-5xl md:text-6xl">{title}</h1>
+    {lead && <p class="mt-5 max-w-2xl text-lg text-sky md:text-xl">{lead}</p>}
+    <slot />
+  </div>
+</section>

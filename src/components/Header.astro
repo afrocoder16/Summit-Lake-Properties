@@ -1,0 +1,79 @@
+---
+import { nav, site, phoneHref, managerName } from '../config/site';
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href);
+---
+<header class="sticky top-0 z-40 border-b border-sky bg-white/95 backdrop-blur">
+  <div class="container-x flex h-16 items-center justify-between gap-4">
+    <a href="/" class="text-lake" aria-label={`${site.name}, home`}><Logo /></a>
+
+    <nav aria-label="Main" class="hidden md:block">
+      <ul class="flex items-center gap-1">
+        {nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              aria-current={isCurrent(item.href) ? 'page' : undefined}
+              class="nav-link"
+            >{item.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <a href={phoneHref} class="btn btn-lake hidden !min-h-[44px] !px-4 text-[0.95rem] lg:inline-flex">
+        <Icon name="phone" class="h-5 w-5" />
+        Call {managerName} {site.phone}
+      </a>
+      <button
+        type="button"
+        class="grid h-12 w-12 place-items-center rounded-full text-lake md:hidden"
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+        data-menu-button
+      >
+        <span data-open><Icon name="menu" /></span>
+        <span data-close hidden><Icon name="close" /></span>
+        <span class="sr-only">Menu</span>
+      </button>
+    </div>
+  </div>
+
+  <nav id="mobile-nav" aria-label="Mobile" class="border-t border-sky bg-white md:hidden" hidden data-mobile-nav>
+    <ul class="container-x py-2">
+      {nav.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            aria-current={isCurrent(item.href) ? 'page' : undefined}
+            class="mobile-link"
+          >{item.label}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+  <noscript><style>#mobile-nav{display:block !important}</style></noscript>
+</header>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('[data-menu-button]');
+  const menu = document.querySelector<HTMLElement>('[data-mobile-nav]');
+  if (btn && menu) {
+    const set = (open: boolean) => {
+      btn.setAttribute('aria-expanded', String(open));
+      menu.hidden = !open;
+      btn.querySelector('[data-open]')!.toggleAttribute('hidden', open);
+      btn.querySelector('[data-close]')!.toggleAttribute('hidden', !open);
+    };
+    btn.addEventListener('click', () => set(btn.getAttribute('aria-expanded') !== 'true'));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') {
+        set(false);
+        btn.focus();
+      }
+    });
+  }
+</script>

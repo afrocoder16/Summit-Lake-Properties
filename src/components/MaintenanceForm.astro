@@ -1,0 +1,212 @@
+---
+import { site, phoneHref, managerName } from '../config/site';
+import { emailjsConfigured } from '../config/env';
+import { CONTACT_TIMES, LIMITS } from '../lib/validate';
+import Icon from './Icon.astro';
+---
+<div id="maintenance-root" data-phone={site.phone} data-tel={phoneHref} data-manager={managerName} data-configured={String(emailjsConfigured)}>
+  <form id="maintenance-form" novalidate autocomplete="on" class="card space-y-6 p-6 md:p-9" aria-describedby="form-status">
+    <div class="hp" aria-hidden="true">
+      <label for="company">Leave this field empty</label>
+      <input type="text" id="company" name="company" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2">
+      <div>
+        <label for="name" class="label">Your name</label>
+        <input id="name" name="name" type="text" class="input" autocomplete="name" required maxlength={LIMITS.name} />
+        <p class="field-error" id="name-error" hidden></p>
+      </div>
+      <div>
+        <label for="unit" class="label">Unit number</label>
+        <input id="unit" name="unit" type="text" class="input" autocomplete="off" required maxlength={LIMITS.unit} />
+        <p class="field-error" id="unit-error" hidden></p>
+      </div>
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2">
+      <div>
+        <label for="phone" class="label">Phone number</label>
+        <input id="phone" name="phone" type="tel" inputmode="tel" class="input" autocomplete="tel" required maxlength={LIMITS.phone} />
+        <span class="hint">So {managerName} can reach you.</span>
+        <p class="field-error" id="phone-error" hidden></p>
+      </div>
+      <div>
+        <label for="contactTime" class="label">Best time to reach you</label>
+        <select id="contactTime" name="contactTime" class="input" required>
+          {CONTACT_TIMES.map((t) => <option value={t}>{t}</option>)}
+        </select>
+        <p class="field-error" id="contactTime-error" hidden></p>
+      </div>
+    </div>
+
+    <div>
+      <label for="issue" class="label">What is wrong?</label>
+      <textarea id="issue" name="issue" rows="5" class="input" required maxlength={LIMITS.issue}></textarea>
+      <span class="hint">Describe the problem and where it is, such as the kitchen sink or the bedroom window.</span>
+      <p class="field-error" id="issue-error" hidden></p>
+    </div>
+
+    <div>
+      <label for="photoNote" class="label">Photo note <span class="font-normal text-muted">(optional)</span></label>
+      <textarea id="photoNote" name="photoNote" rows="2" class="input" maxlength={LIMITS.photoNote}></textarea>
+      <span class="hint">Photos cannot be attached here. Say what a photo would show, or that you have one to share.</span>
+    </div>
+
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+      <button type="submit" class="btn btn-lake w-full sm:w-auto sm:min-w-[220px]" id="submit-btn">
+        <span data-submit-label>Send request</span>
+      </button>
+      <p class="text-[0.95rem]">
+        Prefer to talk? <a href={phoneHref} class="whitespace-nowrap font-semibold text-lake underline">Call {managerName} at {site.phone}</a>
+      </p>
+    </div>
+
+    <div id="form-status" tabindex="-1" aria-live="polite" class="rounded-2xl outline-offset-4" hidden></div>
+  </form>
+</div>
+
+<script>
+  import { validateMaintenance, type MaintenanceInput } from '../lib/validate';
+
+  const root = document.getElementById('maintenance-root') as HTMLElement | null;
+  const form = document.getElementById('maintenance-form') as HTMLFormElement | null;
+
+  if (root && form) {
+    const status = document.getElementById('form-status') as HTMLElement;
+    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+    const submitLabel = submitBtn.querySelector('[data-submit-label]') as HTMLElement;
+    const phone = root.dataset.phone ?? '';
+    const tel = root.dataset.tel ?? '#';
+    const manager = root.dataset.manager ?? 'us';
+    const configured = root.dataset.configured === 'true';
+    const COOLDOWN_MS = 30_000;
+    const COOLDOWN_KEY = 'slp-maint-last';
+
+    const fields = ['name', 'unit', 'phone', 'contactTime', 'issue'] as const;
+
+    const callLink = () => {
+      const a = document.createElement('a');
+      a.href = tel;
+      a.textContent = `${manager} at ${phone}`;
+      a.className = 'font-semibold underline';
+      return a;
+    };
+
+    function showStatus(kind: 'success' | 'error' | 'info', title: string, body: string) {
+      status.hidden = false;
+      status.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+      status.className =
+        'rounded-2xl border-2 p-5 ' +
+        (kind === 'success'
+          ? 'border-shore bg-mist text-ink'
+          : kind === 'error'
+            ? 'border-[#B3261E] bg-[#FDECEA] text-ink'
+            : 'border-glow bg-[#FFF6E0] text-ink');
+      status.replaceChildren();
+      const h = document.createElement('p');
+      h.className = 'font-display text-xl font-bold';
+      h.textContent = title;
+      const p = document.createElement('p');
+      p.className = 'mt-1';
+      p.append(body + ' You can also call ', callLink(), '.');
+      status.append(h, p);
+      status.focus();
+    }
+
+    function clearErrors() {
+      for (const f of fields) {
+        const err = document.getElementById(`${f}-error`)!;
+        const input = form!.elements.namedItem(f) as HTMLElement;
+        err.hidden = true;
+        err.textContent = '';
+        input.removeAttribute('aria-invalid');
+        input.removeAttribute('aria-describedby');
+      }
+    }
+
+    function showErrors(errors: Partial<Record<keyof MaintenanceInput, string>>) {
+      let first: HTMLElement | null = null;
+      for (const f of fields) {
+        const msg = errors[f];
+        if (!msg) continue;
+        const err = document.getElementById(`${f}-error`)!;
+        const input = form!.elements.namedItem(f) as HTMLElement;
+        err.textContent = msg;
+        err.hidden = false;
+        input.setAttribute('aria-invalid', 'true');
+        input.setAttribute('aria-describedby', `${f}-error`);
+        first ??= input;
+      }
+      first?.focus();
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.hidden = true;
+      clearErrors();
+
+      const data = Object.fromEntries(new FormData(form));
+
+      // Honeypot: bots fill it, people never see it. Pretend success and send nothing.
+      if (String(data.company ?? '').trim() !== '') {
+        showStatus('success', 'Request sent', 'Thank you.');
+        form.reset();
+        return;
+      }
+
+      const { values, errors } = validateMaintenance(data);
+      if (Object.keys(errors).length) {
+        showErrors(errors);
+        return;
+      }
+
+      try {
+        const last = Number(localStorage.getItem(COOLDOWN_KEY) ?? 0);
+        if (Date.now() - last < COOLDOWN_MS) {
+          showStatus('info', 'One moment', 'Please wait a few seconds before sending another request.');
+          return;
+        }
+      } catch {
+        /* storage unavailable, skip the cooldown */
+      }
+
+      if (!configured) {
+        showStatus(
+          'info',
+          'Sample mode: nothing was sent',
+          'This is a sample website and the email service is not connected yet.',
+        );
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitLabel.textContent = 'Sending...';
+      try {
+        const emailjs = (await import('@emailjs/browser')).default;
+        await emailjs.send(
+          import.meta.env.PUBLIC_EMAILJS_SERVICE_ID,
+          import.meta.env.PUBLIC_EMAILJS_TEMPLATE_ID,
+          {
+            from_name: values.name,
+            unit: values.unit,
+            phone: values.phone,
+            contact_time: values.contactTime,
+            message: values.issue,
+            photo_note: values.photoNote || 'None',
+            submitted_at: new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }),
+          },
+          { publicKey: import.meta.env.PUBLIC_EMAILJS_PUBLIC_KEY },
+        );
+        try { localStorage.setItem(COOLDOWN_KEY, String(Date.now())); } catch { /* ignore */ }
+        form.reset();
+        showStatus('success', 'Request sent', `Thank you, ${values.name.split(' ')[0]}. Your request went to ${manager}.`);
+      } catch {
+        showStatus('error', 'We could not send your request', 'Please try again in a moment.');
+      } finally {
+        submitBtn.disabled = false;
+        submitLabel.textContent = 'Send request';
+      }
+    });
+  }
+</script>
