@@ -3,6 +3,7 @@
 
 interface ImportMetaEnv {
   readonly SITE_URL?: string;
+  readonly BASE_PATH?: string;
   readonly PUBLIC_EMAILJS_SERVICE_ID?: string;
   readonly PUBLIC_EMAILJS_TEMPLATE_ID?: string;
   readonly PUBLIC_EMAILJS_PUBLIC_KEY?: string;

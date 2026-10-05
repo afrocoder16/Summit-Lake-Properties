@@ -81,6 +81,12 @@ export const phoneHref = `tel:+1${site.phone.replace(/\D/g, '')}`;
 export const mailingLines = [site.name, site.mailing.poBox, `${site.mailing.city}, ${site.mailing.state} ${site.mailing.zip}`];
 export const mailingText = mailingLines.join('\n');
 
+/** Prefix a site path with the deploy base (for example /Summit-Lake-Properties on GitHub Pages). */
+export const href = (path: string) => {
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  return `${base}${path}` || '/';
+};
+
 export const nav = [
   { label: 'Home', href: '/' },
   { label: 'Tenants', href: '/tenants' },

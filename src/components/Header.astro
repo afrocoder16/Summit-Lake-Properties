@@ -1,20 +1,20 @@
 ---
-import { nav, site, phoneHref, managerName } from '../config/site';
+import { nav, site, phoneHref, managerName, href } from '../config/site';
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
-const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href);
+const path = Astro.url.pathname.replace(/\/$/, '');
+const isCurrent = (p: string) => path === href(p).replace(/\/$/, '');
 ---
 <header class="sticky top-0 z-40 border-b border-sky bg-white/95 backdrop-blur">
   <div class="container-x flex h-16 items-center justify-between gap-4">
-    <a href="/" class="text-lake" aria-label={`${site.name}, home`}><Logo /></a>
+    <a href={href('/')} class="text-lake" aria-label={`${site.name}, home`}><Logo /></a>
 
     <nav aria-label="Main" class="hidden md:block">
       <ul class="flex items-center gap-1">
         {nav.map((item) => (
           <li>
             <a
-              href={item.href}
+              href={href(item.href)}
               aria-current={isCurrent(item.href) ? 'page' : undefined}
               class="nav-link"
             >{item.label}</a>
@@ -47,7 +47,7 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href
       {nav.map((item) => (
         <li>
           <a
-            href={item.href}
+            href={href(item.href)}
             aria-current={isCurrent(item.href) ? 'page' : undefined}
             class="mobile-link"
           >{item.label}</a>

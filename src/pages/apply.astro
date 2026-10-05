@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
-import { site, phoneHref, managerName } from '../config/site';
+import { site, phoneHref, managerName, href } from '../config/site';
 import { env } from '../config/env';
 
 const formUrl = env.applyFormUrl;
@@ -28,7 +28,7 @@ const formUrl = env.applyFormUrl;
             <a href={phoneHref} class="btn btn-glow mt-6 w-full sm:w-auto"><Icon name="phone" class="h-5 w-5" />Call {managerName} {site.phone}</a>
           </>
         )}
-        <p class="mt-6 text-sm text-muted">See what is open on the <a href="/vacancies" class="font-semibold text-lake underline">vacancies page</a>.</p>
+        <p class="mt-6 text-sm text-muted">See what is open on the <a href={href('/vacancies')} class="font-semibold text-lake underline">vacancies page</a>.</p>
       </div>
 
       <aside class="rounded-3xl border-2 border-lake bg-mist p-7 md:p-9" aria-labelledby="privacy-title">

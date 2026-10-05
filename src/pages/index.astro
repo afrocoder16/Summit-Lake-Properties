@@ -4,7 +4,7 @@ import Announcement from '../components/Announcement.astro';
 import Contours from '../components/Contours.astro';
 import Icon from '../components/Icon.astro';
 import CopyButton from '../components/CopyButton.astro';
-import { site, phoneHref, managerName, mailingText } from '../config/site';
+import { site, phoneHref, managerName, mailingText, href } from '../config/site';
 
 const pillars = [
   { icon: 'phone', title: 'Responsive', text: 'You always know who to call and where to send a request.' },
@@ -31,7 +31,7 @@ const pillars = [
             <Icon name="phone" class="h-5 w-5" />
             Call {managerName} {site.phone}
           </a>
-          <a href="/tenants" class="btn btn-line-light">Pay rent or request maintenance</a>
+          <a href={href('/tenants')} class="btn btn-line-light">Pay rent or request maintenance</a>
         </div>
       </div>
 
@@ -71,7 +71,7 @@ const pillars = [
           </address>
           <div class="mt-4 flex flex-wrap gap-2">
             <CopyButton text={mailingText} class="btn btn-line !min-h-[48px] !px-5" />
-            <a href="/tenants#pay-rent" class="btn !min-h-[48px] !px-4 text-lake underline">How to pay</a>
+            <a href={href('/tenants#pay-rent')} class="btn !min-h-[48px] !px-4 text-lake underline">How to pay</a>
           </div>
         </article>
 
@@ -113,14 +113,14 @@ const pillars = [
     <div class="container-x">
       <h2 id="next" class="reveal text-3xl sm:text-4xl md:text-5xl">What would you like to do?</h2>
       <div class="mt-10 grid gap-5 md:grid-cols-2">
-        <a href="/tenants#maintenance" class="card reveal group flex items-start gap-5 p-7 no-underline transition hover:-translate-y-1">
+        <a href={href('/tenants#maintenance')} class="card reveal group flex items-start gap-5 p-7 no-underline transition hover:-translate-y-1">
           <span class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-glow text-ink"><Icon name="wrench" class="h-7 w-7" /></span>
           <span>
             <span class="block font-display text-2xl font-bold text-lake">Request maintenance</span>
             <span class="mt-1 block text-ink">Tell us what is wrong and the best time to reach you.</span>
           </span>
         </a>
-        <a href="/vacancies" class="card reveal group flex items-start gap-5 p-7 no-underline transition hover:-translate-y-1">
+        <a href={href('/vacancies')} class="card reveal group flex items-start gap-5 p-7 no-underline transition hover:-translate-y-1">
           <span class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-sky text-lake"><Icon name="home" class="h-7 w-7" /></span>
           <span>
             <span class="block font-display text-2xl font-bold text-lake">Looking for a home?</span>

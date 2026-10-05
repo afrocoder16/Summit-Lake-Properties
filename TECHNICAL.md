@@ -74,6 +74,7 @@ See `.env.example`. Never commit `.env`.
 - `PUBLIC_EMAILJS_PUBLIC_KEY`
 - `PUBLIC_VACANCIES_CSV_URL`
 - `PUBLIC_APPLY_FORM_URL`
+- `BASE_PATH`: sub-path when hosted in a folder (GitHub Pages sets it in CI). Empty for a domain root.
 
 `PUBLIC_` values are bundled into the browser build. That is how client side EmailJS works on static hosting. The EmailJS public key is designed to be public, but see the security notes below.
 
@@ -117,6 +118,10 @@ The logo mark in the header is a generated SVG placeholder for the sample, not S
 - External links open with `rel="noopener noreferrer"`.
 - URLs from `.env` must be https (plain http only for localhost testing).
 
+## Deployment
+
+GitHub Actions (`.github/workflows/deploy.yml`) builds and deploys to GitHub Pages on every push to `master` or `main`. The workflow sets `SITE_URL` and `BASE_PATH` from the Pages settings, runs `npm run verify`, then publishes `dist/`. The EmailJS, vacancy and apply values can be set as repository variables with the same names as in `.env.example` (Settings, Secrets and variables, Actions, Variables). They are public by design. Until they are set, the site runs in sample mode. Enabling Pages automatically through the workflow is unconfirmed, needs verification (if the first run fails, set Settings, Pages, Source to GitHub Actions).
+
 ## Checks run on 2026-10-05
 
 - `npm run build`: passes, 6 pages.
@@ -133,4 +138,5 @@ The logo mark in the header is a generated SVG placeholder for the sample, not S
 
 ## Changelog
 
+- 2026-10-05: Added base path support and the GitHub Pages deploy workflow.
 - 2026-10-05: Initial sample build. Pages, config, EmailJS form, vacancies CSV, apply link, sitemap, verify script.

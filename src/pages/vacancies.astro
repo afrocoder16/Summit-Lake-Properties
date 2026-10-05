@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
-import { site, phoneHref, managerName } from '../config/site';
+import { site, phoneHref, managerName, href } from '../config/site';
 import { env } from '../config/env';
 
 const url = env.vacanciesCsvUrl;
@@ -51,7 +51,7 @@ const url = env.vacanciesCsvUrl;
       </noscript>
 
       <p class="mx-auto mt-12 max-w-xl text-center">
-        Ready to apply? <a href="/apply" class="font-semibold text-lake underline">Start your application</a>.
+        Ready to apply? <a href={href('/apply')} class="font-semibold text-lake underline">Start your application</a>.
       </p>
     </div>
   </section>

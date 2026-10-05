@@ -6,6 +6,7 @@ import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
 import { join, extname } from 'node:path';
 
 const dist = 'dist';
+const base = (process.env.BASE_PATH ?? '').replace(/\/$/, '');
 const failures = [];
 const fail = (msg) => failures.push(msg);
 
@@ -23,7 +24,7 @@ for (const f of htmlFiles) {
   idsByFile.set(f, new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1])));
 }
 const resolve = (path) => {
-  const clean = path.replace(/\/$/, '');
+  const clean = (base && path.startsWith(base) ? path.slice(base.length) : path).replace(/\/$/, '');
   return [join(dist, clean), join(dist, clean, 'index.html'), join(dist, clean + '.html')].find((p) => existsSync(p) && statSync(p).isFile());
 };
 
