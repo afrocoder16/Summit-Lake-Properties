@@ -113,7 +113,7 @@ export const moveSteps = [
 
 export const faqs = [
   { q: 'How do I pay rent?', a: 'You can mail a check or money order to the PO Box listed on the Tenants page. Sign in to the tenant portal to see how online payment will work.' },
-  { q: 'How do I report a maintenance problem?', a: 'Use the maintenance request form on the Tenants page, or call Kane. Say what is wrong, where it is, and the best time to reach you.' },
+  { q: 'How do I report a maintenance problem?', a: 'Use the maintenance request form on the Tenants page, or call us. Say what is wrong, where it is, and the best time to reach you.' },
   { q: 'Who do I contact with questions?', a: 'Kane manages your building. Call or text the number on this page, or send a message through the contact form.' },
   { q: 'What if it is an emergency?', a: 'If anyone is in danger, call 911 first, then let Kane know.' },
   { q: 'How do I see a home that is available?', a: 'Open the Vacancies page, look through the photos, then text, call or request a tour from any home.' },

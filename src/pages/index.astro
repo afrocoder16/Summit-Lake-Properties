@@ -39,7 +39,7 @@ const img = (p: { src: string }) => href(p.src);
         <div class="mt-9 flex flex-col gap-3 sm:flex-row">
           <a href={phoneHref} class="btn btn-glow">
             <Icon name="phone" class="h-5 w-5" />
-            Call {managerName} {site.phone}
+            Call us {site.phone}
           </a>
           <a href={href('/portal')} class="btn btn-line-light">Sign in to the tenant portal</a>
         </div>
@@ -256,7 +256,7 @@ const img = (p: { src: string }) => href(p.src);
       <div class="reveal">
         <h2 id="faq" class="text-3xl sm:text-4xl md:text-5xl">Common questions</h2>
         <p class="mt-4 text-lg">Quick answers for residents and anyone looking for a home.</p>
-        <a href={phoneHref} class="btn btn-line mt-6"><Icon name="phone" class="h-5 w-5" />Still unsure? Call {managerName}</a>
+        <a href={phoneHref} class="btn btn-line mt-6"><Icon name="phone" class="h-5 w-5" />Still unsure? Call us</a>
       </div>
       <div class="reveal space-y-3">
         {faqs.map((f) => (
@@ -274,7 +274,7 @@ const img = (p: { src: string }) => href(p.src);
     <Contours id="cta" class="absolute inset-0 -z-10 h-full w-full" lake={false} cx={1000} cy={220} rings={8} />
     <div class="container-x py-16 text-center md:py-20">
       <h2 id="cta" class="mx-auto max-w-3xl text-3xl text-white sm:text-4xl md:text-5xl">What would you like to do?</h2>
-      <p class="mx-auto mt-4 max-w-xl text-lg text-sky">Pay rent, ask for a repair, see a home or just say hello. {managerName} is a call or text away.</p>
+      <p class="mx-auto mt-4 max-w-xl text-lg text-sky">Pay rent, ask for a repair, see a home or just say hello. We are a call or text away.</p>
       <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
         <a href={href('/portal')} class="btn btn-glow"><Icon name="lock" class="h-5 w-5" />Tenant portal</a>
         <a href={href('/tenants#maintenance')} class="btn btn-line-light"><Icon name="wrench" class="h-5 w-5" />Request maintenance</a>

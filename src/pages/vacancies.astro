@@ -10,7 +10,7 @@ import { sampleVacancies } from '../config/sample';
 
 const url = env.vacanciesCsvUrl;
 ---
-<Base title="Vacancies" description={`Current vacancies from ${site.name} in ${site.city}, ${site.state}. Call ${managerName} at ${site.phone} with questions.`}>
+<Base title="Vacancies" description={`Current vacancies from ${site.name} in ${site.city}, ${site.state}. Call us at ${site.phone} with questions.`}>
   <PageHero id="vacancies" eyebrow="Vacancies" title="Available homes" lead="Current openings, listed as they come up." />
 
   <section class="section" aria-labelledby="vac-title" id="vacancies-root" data-csv-url={url ?? ''}>
@@ -61,7 +61,7 @@ const url = env.vacanciesCsvUrl;
                   <p class="mt-4 grow">{v.details}</p>
                   <div class="mt-5 grid gap-3">
                     <button type="button" data-open-home={`home-${v.id}`} class="btn btn-lake"><Icon name="image" class="h-5 w-5" />Photos and contact</button>
-                    <a href={smsHref(`Hi ${managerName}, I'm interested in ${v.unit} at $${v.rent} a month. Is it still available?`)} class="btn btn-line"><Icon name="message" class="h-5 w-5" />Text {managerName}</a>
+                    <a href={smsHref(`Hi ${managerName}, I'm interested in ${v.unit} at $${v.rent} a month. Is it still available?`)} class="btn btn-line"><Icon name="message" class="h-5 w-5" />Text us</a>
                   </div>
                 </div>
               </li>
@@ -103,23 +103,23 @@ const url = env.vacanciesCsvUrl;
           <path d="M24 138c10-4 16-4 26 0M96 140c10-4 16-4 26 0M168 138c10-4 16-4 26 0" stroke="var(--sky)" stroke-width="2" fill="none" stroke-linecap="round" />
         </svg>
         <h2 class="mt-4 text-3xl">No vacancies right now</h2>
-        <p class="mt-3 text-lg">Nothing is listed at the moment. Call {managerName} to ask about availability.</p>
-        <a href={phoneHref} class="btn btn-lake mt-6"><Icon name="phone" class="h-5 w-5" />Call {managerName} {site.phone}</a>
+        <p class="mt-3 text-lg">Nothing is listed at the moment. Call us to ask about availability.</p>
+        <a href={phoneHref} class="btn btn-lake mt-6"><Icon name="phone" class="h-5 w-5" />Call us {site.phone}</a>
       </div>
 
       <!-- Error -->
       <div data-state="error" role="alert" class="mx-auto max-w-xl rounded-3xl border-2 border-glow bg-[#FFF6E0] p-7 text-center" hidden>
         <h2 class="text-2xl">We could not load the vacancy list</h2>
-        <p class="mt-2">Please try again in a moment, or call {managerName} for what is available.</p>
-        <a href={phoneHref} class="btn btn-lake mt-5"><Icon name="phone" class="h-5 w-5" />Call {managerName} {site.phone}</a>
+        <p class="mt-2">Please try again in a moment, or call us for what is available.</p>
+        <a href={phoneHref} class="btn btn-lake mt-5"><Icon name="phone" class="h-5 w-5" />Call us {site.phone}</a>
       </div>
 
       <noscript>
-        <p class="mt-6 text-center">Turn on JavaScript to see the vacancy list, or call <a href={phoneHref} class="font-semibold text-lake underline">{managerName} at {site.phone}</a>.</p>
+        <p class="mt-6 text-center">Turn on JavaScript to see the vacancy list, or call <a href={phoneHref} class="font-semibold text-lake underline">us at {site.phone}</a>.</p>
       </noscript>
 
       <p class="mx-auto mt-12 max-w-xl text-center">
-        Want to see a home in person? <a href={phoneHref} class="font-semibold text-lake underline">Call {managerName} at {site.phone}</a> or use <strong>Photos and contact</strong> on any home to send a message or request a tour.
+        Want to see a home in person? <a href={phoneHref} class="font-semibold text-lake underline">Call us at {site.phone}</a> or use <strong>Photos and contact</strong> on any home to send a message or request a tour.
       </p>
     </div>
   </section>

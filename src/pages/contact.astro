@@ -12,7 +12,7 @@ import { site, phoneHref, managerName, mailingText, href } from '../config/site'
     <div class="container-x grid gap-6 lg:grid-cols-2">
       <article class="card p-7 md:p-9">
         <span class="grid h-12 w-12 place-items-center rounded-2xl bg-glow text-ink"><Icon name="phone" /></span>
-        <h2 class="mt-5 text-3xl">Call {managerName}</h2>
+        <h2 class="mt-5 text-3xl">Call us</h2>
         <p class="mt-2">Questions, concerns, maintenance or other matters.</p>
         <a href={phoneHref} class="mt-4 inline-block py-1 font-display text-4xl font-bold text-lake sm:text-5xl">{site.phone}</a>
         <p class="mt-5"><a href={phoneHref} class="btn btn-lake w-full sm:w-auto"><Icon name="phone" class="h-5 w-5" />Call now</a></p>
@@ -58,7 +58,7 @@ import { site, phoneHref, managerName, mailingText, href } from '../config/site'
       <div class="card-mist flex flex-col items-start justify-between gap-5 p-7 md:flex-row md:items-center md:p-9">
         <div>
           <h2 class="text-2xl md:text-3xl">Something needs fixing?</h2>
-          <p class="mt-1">Send a maintenance request online, or call {managerName}.</p>
+          <p class="mt-1">Send a maintenance request online, or call us.</p>
         </div>
         <a href={href('/tenants#maintenance')} class="btn btn-lake shrink-0">Request maintenance</a>
       </div>
