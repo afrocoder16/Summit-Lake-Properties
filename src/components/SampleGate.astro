@@ -1,0 +1,199 @@
+---
+// MIDVORA SAMPLE GATE, Astro version (kit version 2.2). Same behavior as the React SampleGate.jsx.
+// Shows a name-and-email card before the sample, emails Midvora through Web3Forms, then opens the sample.
+// Full instructions: the Midvora sample kit README (private repo afrocoder16/midvora-sample-kit).
+//
+// Put <SampleGate /> as the FIRST thing inside <body> of the shared layout. It is plain HTML plus one small
+// inline script (no framework). While the gate shows, gate.css stops the rest of the page from rendering.
+//
+// ──────────────── EDIT THESE TWO LINES FOR EACH NEW SAMPLE ────────────────
+const CLIENT = 'Summit Lake Properties'; // shown to the visitor and used in the email subject
+const SAMPLE_LABEL = 'Summit Lake Properties website'; // the "sample" field in the notification email
+// ───────────────────────────────────────────────────────────────────────────
+
+// Fail loudly (the build stops) rather than show a client someone else's name (or this placeholder).
+if (CLIENT.includes('CLIENT NAME HERE') || SAMPLE_LABEL.includes('CLIENT NAME HERE')) {
+  throw new Error('SampleGate: set CLIENT and SAMPLE_LABEL at the top of SampleGate.astro before using the kit.');
+}
+
+// Set at build time. In GitHub Actions: repo variable VITE_GATE_KEY mapped to PUBLIC_GATE_KEY. Locally: .env
+// The Web3Forms access key is a PUBLIC key by design (it ends up in the page code), so a variable is fine.
+const KEY: string = import.meta.env.PUBLIC_GATE_KEY || '';
+// PUBLIC_FORCE_GATE=1 shows the gate even without a key (to design or test it). Nothing is sent in that mode.
+const FORCE = import.meta.env.PUBLIC_FORCE_GATE === '1';
+// If the notification cannot be sent (ad blocker, network), offer a way in rather than trapping the client.
+const ALLOW_SKIP_ON_FAILURE = true;
+
+// Every GitHub Pages sample under one account shares ONE browser origin (youraccount.github.io), so the
+// "remembered visitor" key must be unique per sample or opening one client's sample would unlock the others.
+// Same key format as the React kit.
+const slug = CLIENT.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const STORE = `midvora-sample-visitor:${slug}`;
+
+const enabled = Boolean(KEY) || FORCE;
+const logo = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/midvora-logo.png`;
+const vars = { CLIENT, KEY, STORE, SAMPLE_LABEL };
+---
+{enabled ? (
+  <>
+    <div class="gate" id="midvora-gate" hidden>
+      <div class="gate__glow gate__glow--one" aria-hidden="true"></div>
+      <div class="gate__glow gate__glow--two" aria-hidden="true"></div>
+      <main class="gate__card" aria-live="polite">
+        <img class="gate__logo" src={logo} alt="Midvora. From the Midwest. For the World." width="237" height="146" />
+
+        <div data-view="ask">
+          <p class="gate__eyebrow">Private preview</p>
+          <h1>Welcome to your sample.</h1>
+          <p class="gate__lede">We built a sample website for {CLIENT}. Tell us who you are and we will open it for you.</p>
+          <form data-form>
+            <label>
+              <span>Your name</span>
+              <input type="text" name="name" autocomplete="name" placeholder="Jane Smith" required />
+            </label>
+            <label>
+              <span>Your email</span>
+              <input type="email" name="email" autocomplete="email" placeholder="jane@company.com" required />
+            </label>
+            {/* Honeypot: a hidden CHECKBOX that only a bot would tick. It must not be a text field: browser
+                autofill fills hidden text fields, and the form then silently did nothing for real visitors. */}
+            <input type="checkbox" name="botcheck" tabindex="-1" aria-hidden="true" class="gate__trap" />
+            <p class="gate__error" role="alert" data-error hidden>
+              We could not send your request just now. Please try again in 5 minutes.
+              {ALLOW_SKIP_ON_FAILURE && (
+                <> Or <button type="button" class="gate__skip" data-skip>open the sample anyway</button>.</>
+              )}
+            </p>
+            <button type="submit" class="gate__button" data-submit>View the sample</button>
+          </form>
+          <p class="gate__fine">
+            {KEY
+              ? 'Your name, email, and browser details are sent to Midvora (through the Web3Forms service) so we know the sample was opened.'
+              : 'Preview mode: nothing is sent.'}
+          </p>
+        </div>
+
+        <div class="gate__done" data-view="done" hidden>
+          <span class="gate__check" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+          </span>
+          <h1 tabindex="-1" data-done-title></h1>
+          <p class="gate__lede" data-done-lede></p>
+          <button type="button" class="gate__button" data-open>Open the sample</button>
+        </div>
+      </main>
+    </div>
+
+    <script is:inline define:vars={vars}>
+      (function () {
+        var root = document.getElementById('midvora-gate');
+        if (!root) return;
+
+        function read() {
+          try { return JSON.parse(localStorage.getItem(STORE)); } catch (e) { return null; }
+        }
+        // Already a remembered visitor: no gate.
+        if (read()) { root.remove(); return; }
+
+        function remember(record) {
+          // Private mode: they just see the gate again next visit.
+          try { localStorage.setItem(STORE, JSON.stringify(record)); } catch (e) { /* ignore */ }
+        }
+
+        var html = document.documentElement;
+        html.classList.add('gate-on');
+        root.hidden = false;
+
+        var form = root.querySelector('[data-form]');
+        var errorBox = root.querySelector('[data-error]');
+        var submit = root.querySelector('[data-submit]');
+        var askView = root.querySelector('[data-view="ask"]');
+        var doneView = root.querySelector('[data-view="done"]');
+        var failed = false;
+
+        function openSite() {
+          html.classList.remove('gate-on');
+          root.remove();
+          window.scrollTo(0, 0);
+        }
+        function current() {
+          return { name: form.elements.name.value.trim(), email: form.elements.email.value.trim() };
+        }
+
+        async function notifyMidvora(record) {
+          var controller = new AbortController();
+          var timer = setTimeout(function () { controller.abort(); }, 15000);
+          try {
+            var response = await fetch('https://api.web3forms.com/submit', {
+              method: 'POST',
+              signal: controller.signal,
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify({
+                access_key: KEY,
+                subject: 'Sample opened: ' + record.name + ' (' + CLIENT + ')',
+                from_name: 'Midvora sample gate',
+                replyto: record.email,
+                name: record.name,
+                email: record.email,
+                sample: SAMPLE_LABEL,
+                page: window.location.href,
+                opened_at: new Date().toISOString(),
+                referrer: document.referrer || 'direct',
+                browser: navigator.userAgent,
+              }),
+            });
+            var result = await response.json();
+            if (!result.success) throw new Error(result.message || 'Web3Forms returned ' + response.status);
+          } finally {
+            clearTimeout(timer);
+          }
+        }
+
+        function showDone(record) {
+          var first = record.name ? record.name.split(' ')[0] : '';
+          var title = KEY ? 'We got your request' + (first ? ', ' + first : '') + '.' : 'Welcome' + (first ? ', ' + first : '') + '.';
+          var heading = root.querySelector('[data-done-title]');
+          heading.textContent = title;
+          // Only claim we received something if it was really sent.
+          root.querySelector('[data-done-lede]').textContent = (KEY ? 'Thank you for your interest. ' : '') + 'Your ' + CLIENT + ' sample is ready.';
+          askView.hidden = true;
+          doneView.hidden = false;
+          heading.focus();
+          root.querySelector('[data-open]').onclick = openSite;
+        }
+
+        form.addEventListener('submit', async function (event) {
+          event.preventDefault();
+          // Honeypot: only a bot ticks the hidden checkbox.
+          if (new FormData(form).get('botcheck')) return;
+          var record = current();
+          submit.disabled = true;
+          submit.textContent = 'Sending…';
+          errorBox.hidden = true;
+          try {
+            if (KEY) await notifyMidvora(record);
+            remember(record);
+            showDone(record);
+          } catch (error) {
+            console.error('Sample gate could not send the request:', error);
+            failed = true;
+            errorBox.hidden = false;
+          }
+          submit.disabled = false;
+          submit.textContent = failed ? 'Try again' : 'View the sample';
+        });
+
+        var skip = root.querySelector('[data-skip]');
+        if (skip) skip.addEventListener('click', function () { remember(current()); openSite(); });
+
+        form.elements.name.focus();
+      })();
+    </script>
+  </>
+) : (
+  import.meta.env.PROD && (
+    <script is:inline>
+      console.warn('Sample gate disabled: PUBLIC_GATE_KEY was not set at build time, so visitors are not being recorded.');
+    </script>
+  )
+)}

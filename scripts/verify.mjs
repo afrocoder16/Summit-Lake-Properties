@@ -30,7 +30,7 @@ const resolve = (path) => {
 
 for (const f of htmlFiles) {
   const html = readFileSync(f, 'utf8');
-  if (!html.includes('Sample website by Midvora')) fail(`${f}: missing sample banner`);
+  if (!html.includes('Unofficial sample')) fail(`${f}: missing sample banner`);
   if (!/<meta name="robots" content="noindex/.test(html)) fail(`${f}: missing noindex`);
   for (const m of html.matchAll(/<img\b[^>]*>/g)) if (!/\salt=/.test(m[0])) fail(`${f}: img without alt`);
   for (const m of html.matchAll(/\s(?:href|src)="([^"]+)"/g)) {

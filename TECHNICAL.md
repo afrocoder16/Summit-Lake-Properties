@@ -2,7 +2,7 @@
 
 Last updated: 2026-10-05
 
-Sample website by Midvora. This is a pitch sample, not a live site. Every page carries a "Sample website by Midvora" banner and a `noindex, nofollow` meta tag.
+Sample website by Midvora. This is a pitch sample, not a live site. Every page carries an "Unofficial sample" banner and a `noindex, nofollow` meta tag, and the site can sit behind the Midvora visitor gate (see Sample gate).
 
 ## Stack
 
@@ -34,12 +34,13 @@ src/
   lib/csv.ts              CSV parser and vacancy column whitelist
   lib/vacancies.ts        fetches and renders the vacancy sheet
   config/sample.ts        invented sample data (units, rents, photos, payment history)
-  components/             Banner, Header, Footer, CallBar, Announcement, Contours,
+  components/             SampleGate, SampleBanner, Header, Footer, CallBar, Announcement, Contours,
                           PageHero, Icon, Logo, CopyButton, MaintenanceForm,
                           PaymentMethods, PayFlow, PhotoSlider, HomeViewer, InquiryForm
   layouts/Base.astro      head, meta, Open Graph, noindex, skip link
   pages/                  index, tenants, pay, vacancies, apply, contact, 404, sitemap.xml
   styles/global.css       color variables and shared component classes
+  styles/gate.css         sample gate card and banner styles (from the Midvora sample kit)
 public/                   favicon.svg, og-image.png, robots.txt, sample/ (stock photos)
 scripts/verify.mjs        post build checks
 scripts/make-og.mjs       optional, regenerates og-image.png (needs Playwright)
@@ -89,6 +90,17 @@ See `.env.example`. Never commit `.env`.
 - Apply: Google Form link when `PUBLIC_APPLY_FORM_URL` is set, otherwise "Call Kane to apply". A privacy note about Social Security numbers always shows.
 - Contact: phone, mailing address, plus email, building addresses and office hours only when set.
 - 404 and `/sitemap.xml` (generated from the nav list).
+
+## Sample gate (Midvora sample kit v2.2, Astro variant)
+
+Before the sample opens, a visitor sees a Midvora card asking for a name and email. Midvora gets an email through Web3Forms (`Sample opened: <name> (Summit Lake Properties)`), so we know the client looked. It is a **soft gate**: it records who looked and does not hide the files.
+
+- Files: `components/SampleGate.astro`, `components/SampleBanner.astro`, `styles/gate.css`, `public/midvora-logo.png`. Wired in `layouts/Base.astro`. The client name is set at the top of `SampleGate.astro` (`CLIENT`, `SAMPLE_LABEL`); the build fails if the kit placeholder is left in.
+- Variables: `PUBLIC_GATE_KEY` (Midvora Web3Forms access key, public by design) and `PUBLIC_FORCE_GATE=1` to preview. In CI the key comes from the repo variable `VITE_GATE_KEY` (same name the kit publishing script sets), mapped in `deploy.yml`.
+- Modes: no key means no gate (the site opens straight away and the production build logs a console warning); `PUBLIC_FORCE_GATE=1` shows the gate and sends nothing ("Preview mode: nothing is sent."); with a key it sends a real email. Messages are truthful: "We got your request" only appears after a real send. If the send fails the visitor sees the error and can open the sample anyway.
+- A remembered visitor is stored under `midvora-sample-visitor:summit-lake-properties`, so other samples on the same github.io account are not unlocked by this one.
+- While the gate shows, `gate.css` stops the rest of the page from rendering. Without JavaScript the gate stays hidden.
+- Not tested: a real Web3Forms submission (it emails Midvora). Do one from a normal browser on the live link and confirm the email arrives.
 
 ## Design samples (pitch aids)
 
@@ -175,10 +187,17 @@ GitHub Actions (`.github/workflows/deploy.yml`) builds and deploys to GitHub Pag
 ## Checks run on 2026-10-05
 
 - `npm run build`: passes, 6 pages.
-- `npm run verify`: banner and noindex on every page, no broken links or anchors, no em dashes.
+- `npm run verify`: sample banner and noindex on every page, no broken links or anchors, no em dashes.
 - Layout checked at 375, 768 and 1280 px: no horizontal overflow on any page.
 - Functional checks in Chromium: validation errors, honeypot, sample mode, EmailJS error path, copy button, mobile menu, skip link, vacancy states (results, empty, error, no URL), apply with and without URL.
 - Not tested: a real EmailJS send, a real Google Sheet, a real Google Form, screen readers, Safari and Firefox.
+
+## Checks run on 2026-11-02
+
+- `npm run build` and `npm run verify`: pass, 7 pages.
+- Phone widths 360, 375 and 390: no horizontal overflow and no tap target under 40 px on any page; menu, vacancy slider and viewer, inquiry form, full pay flow and account view exercised in Chromium with touch emulation.
+- Gate: no key, preview mode and key mode (Web3Forms call mocked, nothing real sent) all pass.
+- Not tested: a real Web3Forms send, a real EmailJS send, Safari, Firefox, screen readers, Chrome autofill on the gate.
 
 ## Known gaps
 
@@ -191,6 +210,8 @@ GitHub Actions (`.github/workflows/deploy.yml`) builds and deploys to GitHub Pag
 
 ## Changelog
 
+- 2026-11-02: Phone polish: payment cards compact on small screens, bedroom filter fits one row, pay page no longer overflows sideways in the account view, sticky call bar can no longer cover a focused or scrolled-to button (`scroll-padding-bottom`), copy fix on Tenants.
+- 2026-11-02: Added the Midvora sample gate and banner (kit v2.2 Astro variant), replacing the old plain banner.
 - 2026-11-02: Added the `/pay` sample flow (Stripe style checkout, receipt, autopay and history), vacancy photo sliders with a full screen viewer, text / call / inquiry / tour request options, and a "Pay rent" nav item.
 - 2026-11-02: Added sample "Ways to pay" section and sample vacancy listings (see Design samples).
 - 2026-10-05: Added base path support and the GitHub Pages deploy workflow.

@@ -19,6 +19,10 @@
     -webkit-text-size-adjust: 100%;
     scroll-padding-top: 5rem;
   }
+  /* The sticky call bar (phones only) must never cover a focused or scrolled-to button. */
+  @media (max-width: 767px) {
+    html { scroll-padding-bottom: 6rem; }
+  }
   body {
     @apply bg-white font-sans text-ink antialiased;
     font-size: 1.0625rem;

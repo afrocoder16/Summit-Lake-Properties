@@ -1,0 +1,15 @@
+---
+// OPTIONAL but recommended. A thin bar above the site that says plainly this is an unofficial sample made by Midvora.
+// Astro version of SampleBanner.jsx (kit v2.2). Put it first in <body> of the shared layout, after <SampleGate />.
+interface Props { client: string }
+const { client } = Astro.props;
+
+// Fail loudly (the build stops) rather than show a client the placeholder.
+if (!client || client.includes('Client Name Here')) {
+  throw new Error('SampleBanner: pass the real client name, e.g. <SampleBanner client="Acme Plumbing" />.');
+}
+---
+<div class="sample-banner" role="note">
+  <strong>Unofficial sample</strong> prepared by Midvora for {client}.
+  Not the live website. Prices, photos, and offers are placeholders.
+</div>

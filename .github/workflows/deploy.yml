@@ -27,8 +27,6 @@ jobs:
 
       - uses: actions/configure-pages@v5
         id: pages
-        with:
-          enablement: true
 
       - run: npm ci
 
@@ -39,6 +37,7 @@ jobs:
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
           PUBLIC_EMAILJS_SERVICE_ID: ${{ vars.PUBLIC_EMAILJS_SERVICE_ID }}
           PUBLIC_EMAILJS_TEMPLATE_ID: ${{ vars.PUBLIC_EMAILJS_TEMPLATE_ID }}
+          PUBLIC_GATE_KEY: ${{ vars.VITE_GATE_KEY }}
           PUBLIC_EMAILJS_INQUIRY_TEMPLATE_ID: ${{ vars.PUBLIC_EMAILJS_INQUIRY_TEMPLATE_ID }}
           PUBLIC_EMAILJS_PUBLIC_KEY: ${{ vars.PUBLIC_EMAILJS_PUBLIC_KEY }}
           PUBLIC_VACANCIES_CSV_URL: ${{ vars.PUBLIC_VACANCIES_CSV_URL }}

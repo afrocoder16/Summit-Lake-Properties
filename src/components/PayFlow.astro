@@ -60,24 +60,24 @@ const money = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency',
       <h2 tabindex="-1" data-heading class="text-2xl sm:text-3xl">How would you like to pay?</h2>
       <fieldset class="space-y-3">
         <legend class="sr-only">Payment method</legend>
-        <label class="choice">
+        <label class="choice flex-wrap sm:flex-nowrap">
           <input type="radio" name="method" value="bank" checked class="mt-1 h-5 w-5 accent-[#0F3B4C]" />
           <Icon name="bank" class="mt-0.5 h-6 w-6 shrink-0 text-lake" />
-          <span class="grow">
+          <span class="min-w-0 grow basis-32">
             <span class="block font-display text-xl font-bold text-lake">Bank transfer</span>
             <span class="block text-[0.97rem]">Pay from your checking account. No fee to you.</span>
             <span class="mt-1 inline-block rounded-full bg-glow px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-ink">Recommended</span>
           </span>
-          <span class="text-right font-display text-xl font-bold text-lake" data-bind="total-bank"></span>
+          <span class="basis-full pl-[4.75rem] font-display text-xl font-bold text-lake sm:basis-auto sm:pl-0 sm:text-right" data-bind="total-bank"></span>
         </label>
-        <label class="choice">
+        <label class="choice flex-wrap sm:flex-nowrap">
           <input type="radio" name="method" value="card" class="mt-1 h-5 w-5 accent-[#0F3B4C]" />
           <Icon name="card" class="mt-0.5 h-6 w-6 shrink-0 text-lake" />
-          <span class="grow">
+          <span class="min-w-0 grow basis-32">
             <span class="block font-display text-xl font-bold text-lake">Debit or credit card</span>
             <span class="block text-[0.97rem]">A card fee of <span data-bind="fee-card"></span> is added.</span>
           </span>
-          <span class="text-right font-display text-xl font-bold text-lake" data-bind="total-card"></span>
+          <span class="basis-full pl-[4.75rem] font-display text-xl font-bold text-lake sm:basis-auto sm:pl-0 sm:text-right" data-bind="total-card"></span>
         </label>
       </fieldset>
       <div class="flex flex-col gap-3 sm:flex-row">

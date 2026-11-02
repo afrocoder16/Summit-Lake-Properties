@@ -2,24 +2,27 @@
 import Icon from './Icon.astro';
 import { payMethods } from '../config/sample';
 ---
-<ul class="grid gap-5 sm:grid-cols-2">
+<!-- Compact rows on phones (icon beside the text), stacked cards from sm up. -->
+<ul class="grid gap-4 sm:grid-cols-2 sm:gap-5">
   {payMethods.map((m) => (
-    <li class:list={['card relative flex flex-col p-6', m.recommended && 'border-2 border-glow']}>
-      <span class="flex items-center justify-between">
-        <span class:list={['grid h-12 w-12 place-items-center rounded-2xl', m.live ? 'bg-lake text-white' : 'bg-mist text-lake']}>
-          <Icon name={m.icon} />
-        </span>
-        {m.live ? (
-          <span class="rounded-full bg-lake px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">Available now</span>
-        ) : (
-          <span class="rounded-full bg-glow px-3 py-1 text-xs font-bold uppercase tracking-wide text-ink">Sample</span>
-        )}
+    <li class:list={['card flex gap-4 p-5 sm:flex-col sm:gap-0 sm:p-6', m.recommended && 'border-2 border-glow']}>
+      <span class:list={['grid h-12 w-12 shrink-0 place-items-center rounded-2xl', m.live ? 'bg-lake text-white' : 'bg-mist text-lake']}>
+        <Icon name={m.icon} />
       </span>
-      <h3 class="mt-5 text-xl">{m.title}</h3>
-      <p class="mt-2 grow text-[0.97rem]">{m.text}</p>
-      <p class="mt-4 text-sm font-semibold text-shore">
-        {m.note}{m.recommended && ' · Recommended'}
-      </p>
+      <div class="flex min-w-0 grow flex-col sm:mt-5">
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <h3 class="text-xl">{m.title}</h3>
+          {m.live ? (
+            <span class="rounded-full bg-lake px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-white">Live</span>
+          ) : (
+            <span class="rounded-full bg-glow px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-ink">Sample</span>
+          )}
+        </div>
+        <p class="mt-2 grow text-[0.97rem]">{m.text}</p>
+        <p class="mt-3 text-sm font-semibold text-shore">
+          {m.note}{m.recommended && ' · Recommended'}
+        </p>
+      </div>
     </li>
   ))}
 </ul>
