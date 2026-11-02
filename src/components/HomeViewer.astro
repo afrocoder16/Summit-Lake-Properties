@@ -1,0 +1,101 @@
+---
+import Icon from './Icon.astro';
+import PhotoSlider from './PhotoSlider.astro';
+import InquiryForm from './InquiryForm.astro';
+import CopyButton from './CopyButton.astro';
+import { site, phoneHref, managerName, smsHref } from '../config/site';
+import type { SampleVacancy } from '../config/sample';
+
+interface Props { home: SampleVacancy }
+const { home } = Astro.props;
+const dialogId = `home-${home.id}`;
+const textMessage = `Hi ${managerName}, I'm interested in ${home.unit} at $${home.rent} a month. Is it still available?`;
+---
+<dialog id={dialogId} class="home-dialog" aria-labelledby={`${dialogId}-title`}>
+  <div class="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-sky bg-white px-5 py-3 md:px-8">
+    <span class="rounded-full bg-glow px-3 py-1 text-xs font-bold uppercase tracking-wide text-ink">Sample listing</span>
+    <button type="button" data-close-home class="btn btn-line !min-h-[44px] !px-4">
+      <Icon name="close" class="h-5 w-5" />
+      Close
+    </button>
+  </div>
+
+  <div class="grid gap-8 p-5 md:p-8 lg:grid-cols-[1.25fr_1fr]">
+    <div class="lg:sticky lg:top-20 lg:self-start">
+      <PhotoSlider photos={home.photos} label={`Photos of ${home.unit}`} thumbs eager />
+    </div>
+
+    <div>
+      <h2 id={`${dialogId}-title`} class="text-3xl sm:text-4xl">{home.unit}</h2>
+      <ul class="mt-3 flex flex-wrap gap-2">
+        <li class="rounded-full bg-mist px-3 py-1 text-sm font-semibold text-lake">{home.bedrooms} bed</li>
+        <li class="rounded-full bg-mist px-3 py-1 text-sm font-semibold text-lake">{home.bathrooms} bath</li>
+      </ul>
+      <p class="mt-4 font-display text-4xl font-bold text-lake">${home.rent} <span class="text-lg font-semibold text-muted">per month</span></p>
+      <p class="mt-1 text-sm font-semibold text-muted">Available {home.available}</p>
+      <p class="mt-4">{home.details}</p>
+
+      <div class="mt-6 border-t border-sky pt-6">
+        <h3 class="text-2xl">Interested in this home?</h3>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+          <a href={smsHref(textMessage)} class="btn btn-glow"><Icon name="message" class="h-5 w-5" />Text {managerName}</a>
+          <a href={phoneHref} class="btn btn-lake"><Icon name="phone" class="h-5 w-5" />Call {managerName}</a>
+        </div>
+        <p class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
+          Texting opens your messaging app. On a computer, copy the number:
+          <CopyButton text={site.phone} label={site.phone} class="inline-flex min-h-[44px] items-center gap-2 font-semibold text-lake underline" />
+        </p>
+
+        <InquiryForm id={dialogId} unitLabel={home.unit} rent={home.rent} />
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  const opening = new WeakMap<HTMLDialogElement, HTMLElement>();
+
+  function open(dialog: HTMLDialogElement, opener?: HTMLElement) {
+    if (dialog.open) return;
+    if (opener) opening.set(dialog, opener);
+    dialog.showModal();
+    dialog.querySelector<HTMLElement>('[data-track]')?.scrollTo({ left: 0 });
+    dialog.scrollTop = 0;
+    history.replaceState(null, '', `#${dialog.id}`);
+  }
+
+  document.addEventListener('click', (e) => {
+    const t = e.target as Element;
+    const opener = t.closest<HTMLElement>('[data-open-home]');
+    if (opener) {
+      const dialog = document.getElementById(opener.dataset.openHome ?? '');
+      if (dialog instanceof HTMLDialogElement) open(dialog, opener);
+      return;
+    }
+    if (t.closest('[data-close-home]')) t.closest('dialog')?.close();
+    // A click on the dimmed area (the dialog element itself, outside its content box) closes it.
+    else if (t instanceof HTMLDialogElement && t.classList.contains('home-dialog')) {
+      const r = t.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) t.close();
+    }
+  });
+
+  document.addEventListener(
+    'close',
+    (e) => {
+      const dialog = e.target;
+      if (!(dialog instanceof HTMLDialogElement) || !dialog.classList.contains('home-dialog')) return;
+      history.replaceState(null, '', location.pathname + location.search);
+      opening.get(dialog)?.focus();
+    },
+    true,
+  );
+
+  // A shared link like /vacancies#home-3b opens that home straight away.
+  function openFromHash() {
+    const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (target instanceof HTMLDialogElement && target.classList.contains('home-dialog')) open(target);
+  }
+  openFromHash();
+  window.addEventListener('hashchange', openFromHash);
+</script>

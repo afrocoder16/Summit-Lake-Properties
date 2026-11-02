@@ -33,12 +33,14 @@ src/
   lib/validate.ts         maintenance form validation rules
   lib/csv.ts              CSV parser and vacancy column whitelist
   lib/vacancies.ts        fetches and renders the vacancy sheet
+  config/sample.ts        invented sample data (units, rents, photos, payment history)
   components/             Banner, Header, Footer, CallBar, Announcement, Contours,
-                          PageHero, Icon, Logo, CopyButton, MaintenanceForm
+                          PageHero, Icon, Logo, CopyButton, MaintenanceForm,
+                          PaymentMethods, PayFlow, PhotoSlider, HomeViewer, InquiryForm
   layouts/Base.astro      head, meta, Open Graph, noindex, skip link
-  pages/                  index, tenants, vacancies, apply, contact, 404, sitemap.xml
+  pages/                  index, tenants, pay, vacancies, apply, contact, 404, sitemap.xml
   styles/global.css       color variables and shared component classes
-public/                   favicon.svg, og-image.png, robots.txt
+public/                   favicon.svg, og-image.png, robots.txt, sample/ (stock photos)
 scripts/verify.mjs        post build checks
 scripts/make-og.mjs       optional, regenerates og-image.png (needs Playwright)
 ```
@@ -72,6 +74,7 @@ See `.env.example`. Never commit `.env`.
 - `PUBLIC_EMAILJS_SERVICE_ID`
 - `PUBLIC_EMAILJS_TEMPLATE_ID`
 - `PUBLIC_EMAILJS_PUBLIC_KEY`
+- `PUBLIC_EMAILJS_INQUIRY_TEMPLATE_ID`: separate template for home inquiries and tour requests. Variables sent: `request_type`, `from_name`, `phone`, `unit`, `rent`, `preferred_time`, `message`, `submitted_at`. The template must be created to match (unconfirmed, needs verification).
 - `PUBLIC_VACANCIES_CSV_URL`
 - `PUBLIC_APPLY_FORM_URL`
 - `BASE_PATH`: sub-path when hosted in a folder (GitHub Pages sets it in CI). Empty for a domain root.
@@ -86,6 +89,53 @@ See `.env.example`. Never commit `.env`.
 - Apply: Google Form link when `PUBLIC_APPLY_FORM_URL` is set, otherwise "Call Kane to apply". A privacy note about Social Security numbers always shows.
 - Contact: phone, mailing address, plus email, building addresses and office hours only when set.
 - 404 and `/sitemap.xml` (generated from the nav list).
+
+## Design samples (pitch aids)
+
+All sample content is invented and labelled "Sample" on the page. Content lives in `src/config/sample.ts`.
+
+### Pay rent (`/pay`)
+
+`pages/pay.astro` + `components/PayFlow.astro`. A step-by-step flow that runs only in the browser with invented units and rents. Nothing is sent anywhere and no bank or card details are collected (the card fields on the sample checkout are disabled).
+
+1. Your home: name + unit (autofills the sample rent).
+2. How to pay: bank transfer (no fee) or card (2.9% + 30 cents shown up front).
+3. Review, then a sample "secure checkout" screen styled like the page Stripe hosts, then a receipt.
+4. "Autopay and receipts" tab: sample email-code sign in (any 6 digits), autopay switch, saved bank, payment history. This mirrors Stripe's hosted customer portal.
+
+Design decision: no custom tenant login. Guest checkout covers paying. Autopay and history would come from Stripe's own email-code portal, so there is no password system to build or secure. A custom portal (balance, ledger) needs a backend and is a later phase or a job for a rent platform.
+
+Going live with Stripe (not built): create a Payment Link (ACH + card) with custom fields for unit and name, and replace the checkout step with a link to it. For autopay, create a subscription per tenant and enable the customer portal. Fees and the ACH mandate behavior must be confirmed on Stripe's own pages.
+
+The Tenants page links to `/pay` from the "Ways to pay rent" section (`PaymentMethods.astro`). Mail a check remains the live method.
+
+### Vacancies
+
+- Three sample listings (`sampleVacancies` in `sample.ts`) render only while `PUBLIC_VACANCIES_CSV_URL` is empty. Setting the URL replaces them with the sheet rows.
+- `PhotoSlider.astro`: native scroll-snap slider (swipe on touch), previous/next buttons, "n of N" counter, arrow keys, no auto-rotate, no library. Follows the W3C carousel pattern (region, slide groups, native buttons).
+- `HomeViewer.astro`: one native `<dialog>` per home with a large slider, thumbnails, details and contact options. Escape or Close or a click outside closes it and focus returns to the button. `/vacancies#home-3b` opens that home directly, so a link can be texted.
+- Contact options per home: Text Kane (`sms:` link with a prefilled message, `smsHref()` in `site.ts`), Call Kane, a copy-number fallback for computers, and `InquiryForm.astro` (Ask a question or Request a tour; validation in `validateInquiry`, honeypot, 30 second cooldown, sample mode until EmailJS is set).
+- Photos are downloaded into `public/sample/` (12 files), not hot-linked, so the sample cannot break. They are free stock photos from Pexels, which allows use without attribution. Photo IDs: 2A: 1643383, 2062426, 271624, 1457847. 3B: 1571453, 1457842, 2029694, 3144580. 1C: 1571463, 2724748, 1918291, 6585751 (URL pattern `https://www.pexels.com/photo/<id>/`). These are not photos of the real building. Replace them with Kane's own photos.
+
+### Removing the samples
+
+Delete the `data-sample` block in `pages/vacancies.astro`, the `#ways-to-pay` section in `pages/tenants.astro`, `pages/pay.astro`, the "Pay rent" entry in `nav` in `site.ts`, and `public/sample/`.
+
+### Other changes
+
+- `global.css` forces `[hidden]` to `display: none` so hidden flex and grid elements stay hidden, and locks page scroll while a dialog is open.
+- `verify.mjs` ignores `sms:` links.
+
+## Payment options research (verify fees before quoting)
+
+Figures come from third-party blogs and vendor pages, not official pricing pages. Checked 2026-11-02.
+
+- Mail a check: free, no tracking. Works today.
+- Rent platform portal (TurboTenant, TenantCloud, RentRedi, Avail/Zillow): autopay, receipts, ledger, late fees. Often free ACH for tenants, card fee around 3% paid by tenant. Fastest to launch, but tenants leave this site and it locks in a vendor.
+- Stripe Payment Links or Checkout: ACH about 0.8% capped at $5, cards 2.9% + 30 cents, no monthly fee. Fully branded, money goes to the owner's bank, but there is no tenant ledger or autopay logic.
+- Zelle, Venmo, Cash App: personal-use tools with no records and scam risk. Not recommended as the main method.
+
+Suggested pitch: keep mail now, offer bank transfer as the main online option, card as a backup. Lead with a platform portal, mention Stripe as the custom upgrade.
 
 ## Maintenance form
 
@@ -132,11 +182,16 @@ GitHub Actions (`.github/workflows/deploy.yml`) builds and deploys to GitHub Pag
 
 ## Known gaps
 
+- Photo viewer and inquiry form work for the sample homes only. Rows loaded from the Google Sheet still use the simple card from `lib/vacancies.ts`. Next step: add an optional `photos` column (https URLs, comma separated) to the whitelist in `lib/csv.ts`, and render the same slider and viewer for sheet rows.
+- The Stripe checkout, autopay and portal are visual samples. No Stripe account, keys or Payment Links exist yet.
+- `/pay` is in the nav and sitemap. It is also `noindex` like every page of the sample.
 - Domain and hosting are undecided. `SITE_URL` defaults to localhost, so the sitemap and Open Graph URLs need it set before sharing.
 - `og-image.png` is a screenshot of the hero, generated once.
 - Rent mailing block uses "Summit Lake Properties" as the addressee. Unconfirmed, needs verification.
 
 ## Changelog
 
+- 2026-11-02: Added the `/pay` sample flow (Stripe style checkout, receipt, autopay and history), vacancy photo sliders with a full screen viewer, text / call / inquiry / tour request options, and a "Pay rent" nav item.
+- 2026-11-02: Added sample "Ways to pay" section and sample vacancy listings (see Design samples).
 - 2026-10-05: Added base path support and the GitHub Pages deploy workflow.
 - 2026-10-05: Initial sample build. Pages, config, EmailJS form, vacancies CSV, apply link, sitemap, verify script.

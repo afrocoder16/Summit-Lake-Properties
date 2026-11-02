@@ -3,7 +3,8 @@
 interface Props {
   name:
     | 'phone' | 'mail' | 'wrench' | 'home' | 'clock' | 'pin' | 'check' | 'copy'
-    | 'shield' | 'menu' | 'close' | 'info' | 'mountain' | 'alert' | 'key' | 'wave' | 'form' | 'sparkle';
+    | 'shield' | 'menu' | 'close' | 'info' | 'mountain' | 'alert' | 'key' | 'wave' | 'form' | 'sparkle'
+    | 'bank' | 'card' | 'repeat' | 'lock' | 'chevron-left' | 'chevron-right' | 'message' | 'calendar' | 'image';
   class?: string;
 }
 const { name, class: cls = 'h-6 w-6' } = Astro.props;
@@ -27,6 +28,15 @@ const paths: Record<Props['name'], string> = {
   wave: 'M3 9c2.2-2 3.8-2 6 0s3.8 2 6 0 3.8-2 6 0M3 15c2.2-2 3.8-2 6 0s3.8 2 6 0 3.8-2 6 0',
   form: 'M6 3h9l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm8 0v5h5M8.5 13h7M8.5 17h5',
   sparkle: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z',
+  bank: 'M3 9.5 12 4l9 5.5zM5.5 11.5V18m4.2-6.5V18m4.6-6.5V18m4.2-6.5V18M3.5 20h17',
+  card: 'M4 6h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zM3 10h18M6.5 15h3',
+  repeat: 'M4 11V9a3 3 0 0 1 3-3h11m0 0-2.5-2.5M18 6l-2.5 2.5M20 13v2a3 3 0 0 1-3 3H6m0 0 2.5 2.5M6 18l2.5-2.5',
+  'chevron-left': 'M15 5l-7 7 7 7',
+  'chevron-right': 'M9 5l7 7-7 7',
+  message: 'M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-9l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM8 10h8M8 13h5',
+  calendar: 'M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM4 10h16M8 3v4m8-4v4',
+  image: 'M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM3 16l5-5 4 4 3-3 6 6M15.5 9.5h.01',
+  lock: 'M6 11h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1zM8 11V8a4 4 0 0 1 8 0v3',
 };
 ---
 <svg class={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d={paths[name]} /></svg>

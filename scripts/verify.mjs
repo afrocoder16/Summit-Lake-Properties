@@ -35,7 +35,7 @@ for (const f of htmlFiles) {
   for (const m of html.matchAll(/<img\b[^>]*>/g)) if (!/\salt=/.test(m[0])) fail(`${f}: img without alt`);
   for (const m of html.matchAll(/\s(?:href|src)="([^"]+)"/g)) {
     const url = m[1];
-    if (/^(https?:|mailto:|tel:|data:|#$)/.test(url)) continue;
+    if (/^(https?:|mailto:|tel:|sms:|data:|#$)/.test(url)) continue;
     const [path, hash] = url.split('#');
     const target = path ? resolve(path) : f;
     if (!target) fail(`${f}: broken link ${url}`);

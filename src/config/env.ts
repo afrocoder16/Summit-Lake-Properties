@@ -21,10 +21,16 @@ export const env = {
   emailjs: {
     serviceId: clean(import.meta.env.PUBLIC_EMAILJS_SERVICE_ID),
     templateId: clean(import.meta.env.PUBLIC_EMAILJS_TEMPLATE_ID),
+    inquiryTemplateId: clean(import.meta.env.PUBLIC_EMAILJS_INQUIRY_TEMPLATE_ID),
     publicKey: clean(import.meta.env.PUBLIC_EMAILJS_PUBLIC_KEY),
   },
 };
 
 export const emailjsConfigured = Boolean(
   env.emailjs.serviceId && env.emailjs.templateId && env.emailjs.publicKey,
+);
+
+/** The home inquiry and tour form uses its own EmailJS template. */
+export const inquiryConfigured = Boolean(
+  env.emailjs.serviceId && env.emailjs.inquiryTemplateId && env.emailjs.publicKey,
 );

@@ -32,6 +32,8 @@
     text-wrap: balance;
   }
   a { text-underline-offset: 3px; }
+  [hidden] { display: none !important; }
+  html:has(dialog[open]) { overflow: hidden; }
   :focus-visible {
     outline: 3px solid var(--lake);
     outline-offset: 3px;
@@ -78,6 +80,50 @@
   .input:focus { outline: none; border-color: var(--lake); box-shadow: 0 0 0 4px var(--sky); }
   .input[aria-invalid='true'] { border-color: #B3261E; }
   .field-error { @apply mt-1.5 text-sm font-semibold; color: #B3261E; }
+
+  .filter-chip { @apply inline-flex min-h-[44px] items-center rounded-full border-2 border-sky bg-white px-4 text-[0.97rem] font-semibold text-lake transition; }
+  .filter-chip:hover { @apply bg-mist; }
+  .filter-chip[aria-pressed='true'] { @apply border-lake bg-lake text-white; }
+
+  /* Photo slider: native scroll snap, so touch swipe works with no library. */
+  .slider-track { @apply flex overflow-x-auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
+  .slider-track::-webkit-scrollbar { display: none; }
+  .slider-slide { @apply h-full shrink-0 grow-0 basis-full; scroll-snap-align: center; scroll-snap-stop: always; }
+  .slider-slide img { @apply block h-full w-full object-cover; }
+  .slider-btn { @apply absolute top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white text-lake transition; box-shadow: 0 6px 18px -6px var(--ink); }
+  .slider-btn:hover { @apply bg-glow; }
+  .slider-btn[aria-disabled='true'] { @apply cursor-default opacity-40; }
+  .slider-btn[aria-disabled='true']:hover { @apply bg-white; }
+  .thumb-btn { @apply block w-full overflow-hidden rounded-xl border-2 border-transparent opacity-70 transition; }
+  .thumb-btn:hover { @apply opacity-100; }
+  .thumb-btn[aria-current='true'] { @apply border-lake opacity-100; }
+
+  /* Pay flow: radio cards, step indicator, on/off switch. */
+  .choice { @apply flex cursor-pointer items-start gap-4 rounded-2xl border-2 border-sky bg-white p-5 transition; }
+  .choice:hover { border-color: var(--shore); }
+  .choice:has(:checked) { @apply border-lake bg-mist; }
+  .choice:has(:focus-visible) { outline: 3px solid var(--lake); outline-offset: 3px; }
+
+  .step { @apply flex items-center gap-2 border-t-4 border-sky pt-3 text-muted; }
+  .step[data-state='current'] { @apply border-lake text-lake; }
+  .step[data-state='done'] { @apply border-shore text-lake; }
+  .step-dot { @apply grid h-7 w-7 shrink-0 place-items-center rounded-full bg-sky text-sm font-bold text-lake; }
+  .step[data-state='current'] .step-dot { @apply bg-lake text-white; }
+  .step[data-state='done'] .step-dot { @apply bg-shore text-white; }
+
+  .switch { @apply relative inline-flex h-8 w-14 shrink-0 items-center rounded-full bg-sky transition; }
+  .switch[aria-checked='true'] { @apply bg-lake; }
+  .switch > span { @apply block h-6 w-6 translate-x-1 rounded-full bg-white transition; box-shadow: 0 1px 4px rgb(0 0 0 / 0.3); }
+  .switch[aria-checked='true'] > span { @apply translate-x-7; }
+
+  /* Two option toggle built from radio inputs. */
+  .segment { @apply flex min-h-[44px] cursor-pointer items-center justify-center rounded-full px-3 text-center text-[0.95rem] font-semibold text-lake transition; }
+  .segment:has(:checked) { @apply bg-lake text-white; }
+  .segment:has(:focus-visible) { outline: 3px solid var(--lake); outline-offset: 2px; }
+
+  /* Full screen home viewer (native dialog). */
+  .home-dialog { @apply m-auto max-h-[calc(100dvh-1rem)] w-[min(1100px,calc(100vw-1rem))] overflow-y-auto rounded-3xl border-0 bg-white p-0 text-ink; box-shadow: 0 30px 80px -20px #000; }
+  .home-dialog::backdrop { background: color-mix(in srgb, var(--deep) 80%, transparent); backdrop-filter: blur(3px); }
 
   .prose-sl p + p { @apply mt-4; }
 }

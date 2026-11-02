@@ -1,0 +1,25 @@
+---
+import Icon from './Icon.astro';
+import { payMethods } from '../config/sample';
+---
+<ul class="grid gap-5 sm:grid-cols-2">
+  {payMethods.map((m) => (
+    <li class:list={['card relative flex flex-col p-6', m.recommended && 'border-2 border-glow']}>
+      <span class="flex items-center justify-between">
+        <span class:list={['grid h-12 w-12 place-items-center rounded-2xl', m.live ? 'bg-lake text-white' : 'bg-mist text-lake']}>
+          <Icon name={m.icon} />
+        </span>
+        {m.live ? (
+          <span class="rounded-full bg-lake px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">Available now</span>
+        ) : (
+          <span class="rounded-full bg-glow px-3 py-1 text-xs font-bold uppercase tracking-wide text-ink">Sample</span>
+        )}
+      </span>
+      <h3 class="mt-5 text-xl">{m.title}</h3>
+      <p class="mt-2 grow text-[0.97rem]">{m.text}</p>
+      <p class="mt-4 text-sm font-semibold text-shore">
+        {m.note}{m.recommended && ' · Recommended'}
+      </p>
+    </li>
+  ))}
+</ul>

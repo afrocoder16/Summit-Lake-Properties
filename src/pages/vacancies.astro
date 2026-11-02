@@ -2,8 +2,11 @@
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
-import { site, phoneHref, managerName, href } from '../config/site';
+import PhotoSlider from '../components/PhotoSlider.astro';
+import HomeViewer from '../components/HomeViewer.astro';
+import { site, phoneHref, managerName, href, smsHref } from '../config/site';
 import { env } from '../config/env';
+import { sampleVacancies } from '../config/sample';
 
 const url = env.vacanciesCsvUrl;
 ---
@@ -25,8 +28,73 @@ const url = env.vacanciesCsvUrl;
       <!-- Results -->
       <ul data-state="results" class="grid gap-5 md:grid-cols-2 lg:grid-cols-3" hidden></ul>
 
-      <!-- Empty (also the no URL state) -->
-      <div data-state="empty" class="mx-auto max-w-xl text-center" hidden={Boolean(url)}>
+      <!-- Design sample: shown only while no vacancy sheet URL is set. A real sheet replaces it. -->
+      {!url && (
+        <div data-sample>
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p class="eyebrow">Preview of what is coming</p>
+              <p class="mt-3 max-w-xl">These homes are made up to show how the page will look. Real openings will appear here as soon as they are posted.</p>
+            </div>
+            <div role="group" aria-label="Filter by bedrooms" class="flex flex-wrap gap-2">
+              {[['all', 'All homes'], ['1', '1 bedroom'], ['2', '2 bedrooms']].map(([value, label], i) => (
+                <button type="button" data-filter={value} aria-pressed={i === 0 ? 'true' : 'false'} class="filter-chip">{label}</button>
+              ))}
+            </div>
+          </div>
+
+          <ul class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {sampleVacancies.map((v) => (
+              <li data-beds={v.beds} class="card flex flex-col overflow-hidden">
+                <div class="relative">
+                  <PhotoSlider photos={v.photos} label={`Photos of ${v.unit}`} eager />
+                  <span class="pointer-events-none absolute left-4 top-4 rounded-full bg-glow px-3 py-1 text-xs font-bold uppercase tracking-wide text-ink">Sample listing</span>
+                </div>
+                <div class="flex grow flex-col p-6">
+                  <h3 class="text-2xl">{v.unit}</h3>
+                  <ul class="mt-3 flex flex-wrap gap-2">
+                    <li class="rounded-full bg-mist px-3 py-1 text-sm font-semibold text-lake">{v.bedrooms} bed</li>
+                    <li class="rounded-full bg-mist px-3 py-1 text-sm font-semibold text-lake">{v.bathrooms} bath</li>
+                  </ul>
+                  <p class="mt-4 font-display text-3xl font-bold text-lake">${v.rent} per month</p>
+                  <p class="mt-1 text-sm font-semibold text-muted">Available {v.available}</p>
+                  <p class="mt-4 grow">{v.details}</p>
+                  <div class="mt-5 grid gap-3">
+                    <button type="button" data-open-home={`home-${v.id}`} class="btn btn-lake"><Icon name="image" class="h-5 w-5" />Photos and contact</button>
+                    <a href={smsHref(`Hi ${managerName}, I'm interested in ${v.unit} at $${v.rent} a month. Is it still available?`)} class="btn btn-line"><Icon name="message" class="h-5 w-5" />Text {managerName}</a>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {sampleVacancies.map((v) => <HomeViewer home={v} />)}
+          <p data-filter-empty class="mt-6 text-center text-lg" hidden>No sample homes match that filter.</p>
+
+          <!-- How posting will work. Pitch aid for the owner; delete this block to remove. -->
+          <div class="card-mist mt-14 p-7 md:p-10">
+            <p class="eyebrow">How new openings get posted</p>
+            <h2 class="mt-4 text-2xl sm:text-3xl">Add a home in about a minute</h2>
+            <ol class="mt-6 grid gap-5 md:grid-cols-3">
+              {[
+                ['form', 'Fill in a short form', 'Unit, bedrooms, rent, move-in date and a few details.'],
+                ['sparkle', 'It shows up here', 'The new home appears on this page automatically.'],
+                ['check', 'Mark it rented', 'Change the status and it comes off the page.'],
+              ].map(([icon, title, text], i) => (
+                <li class="flex gap-4">
+                  <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-lake font-display text-lg font-bold text-white">{i + 1}</span>
+                  <span>
+                    <span class="flex items-center gap-2 font-display text-lg font-bold text-lake"><Icon name={icon as 'form' | 'sparkle' | 'check'} class="h-5 w-5" />{title}</span>
+                    <span class="mt-1 block">{text}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      )}
+
+      <!-- Empty (shown only when a sheet is set but has no rows) -->
+      <div data-state="empty" class="mx-auto max-w-xl text-center" hidden>
         <svg viewBox="0 0 240 150" class="mx-auto h-40 w-auto" aria-hidden="true" focusable="false">
           <circle cx="170" cy="46" r="14" fill="var(--glow)" />
           <path d="M10 118 78 36l38 48 22-24 60 58z" fill="var(--sky)" />
@@ -62,6 +130,27 @@ const url = env.vacanciesCsvUrl;
 
   const root = document.getElementById('vacancies-root');
   const url = root?.dataset.csvUrl;
+
+  // Bedroom filter for the design sample listings.
+  const sample = root?.querySelector<HTMLElement>('[data-sample]');
+  if (sample) {
+    const chips = sample.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const cards = sample.querySelectorAll<HTMLElement>('[data-beds]');
+    const none = sample.querySelector<HTMLElement>('[data-filter-empty]')!;
+    chips.forEach((chip) =>
+      chip.addEventListener('click', () => {
+        let shown = 0;
+        chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+        cards.forEach((card) => {
+          const match = chip.dataset.filter === 'all' || card.dataset.beds === chip.dataset.filter;
+          card.hidden = !match;
+          if (match) shown++;
+        });
+        none.hidden = shown > 0;
+      }),
+    );
+  }
+
   if (root && url) {
     const show = (name: string) =>
       root.querySelectorAll<HTMLElement>('[data-state]').forEach((n) => (n.hidden = n.dataset.state !== name));

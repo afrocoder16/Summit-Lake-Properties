@@ -78,6 +78,9 @@ export const managerName = site.manager.lastName
 /** tel: link built from the display phone number. */
 export const phoneHref = `tel:+1${site.phone.replace(/\D/g, '')}`;
 
+/** sms: link with a prefilled message. The "?&body=" form works on both iOS and Android. */
+export const smsHref = (message: string) => `sms:+1${site.phone.replace(/\D/g, '')}?&body=${encodeURIComponent(message)}`;
+
 export const mailingLines = [site.name, site.mailing.poBox, `${site.mailing.city}, ${site.mailing.state} ${site.mailing.zip}`];
 export const mailingText = mailingLines.join('\n');
 
@@ -90,6 +93,7 @@ export const href = (path: string) => {
 export const nav = [
   { label: 'Home', href: '/' },
   { label: 'Tenants', href: '/tenants' },
+  { label: 'Pay rent', href: '/pay' },
   { label: 'Vacancies', href: '/vacancies' },
   { label: 'Apply', href: '/apply' },
   { label: 'Contact', href: '/contact' },
