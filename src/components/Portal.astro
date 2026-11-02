@@ -1,0 +1,621 @@
+---
+import Icon from './Icon.astro';
+import { site, phoneHref, managerName, href } from '../config/site';
+import { payUnits, payDueText, cardFee, portalHistory, sampleRequests } from '../config/sample';
+---
+<!--
+  SAMPLE tenant portal. Everything runs in the browser with invented data.
+  Sign in and create account accept anything, nothing is stored on a server, and passwords are never kept.
+  The "session" is only a name, email and unit in sessionStorage so the demo survives a refresh.
+-->
+<div
+  id="portal"
+  data-units={JSON.stringify(payUnits)}
+  data-due={payDueText}
+  data-card-percent={cardFee.percent}
+  data-card-flat={cardFee.flat}
+  data-history={JSON.stringify(portalHistory)}
+  data-requests={JSON.stringify(sampleRequests)}
+>
+  <!-- ============ Signed out ============ -->
+  <div data-view="auth" class="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
+    <div class="card p-6 md:p-9">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <h2 tabindex="-1" data-heading class="text-2xl sm:text-3xl" data-auth-title>Sign in to your account</h2>
+        <span class="rounded-full bg-glow px-3 py-1 text-xs font-bold uppercase tracking-wide text-ink">Design sample</span>
+      </div>
+
+      <fieldset class="mt-6">
+        <legend class="sr-only">Sign in or create an account</legend>
+        <div class="grid grid-cols-2 gap-2 rounded-full bg-mist p-1">
+          <label class="segment"><input type="radio" name="auth-mode" value="signin" checked class="sr-only" /><span>Sign in</span></label>
+          <label class="segment"><input type="radio" name="auth-mode" value="signup" class="sr-only" /><span>Create account</span></label>
+        </div>
+      </fieldset>
+
+      <!-- Sign in -->
+      <form data-form="signin" novalidate class="mt-6 space-y-5">
+        <div>
+          <label for="in-email" class="label">Email</label>
+          <input id="in-email" name="email" type="email" class="input" autocomplete="email" required maxlength="120" />
+          <p class="field-error" id="in-email-error" hidden></p>
+        </div>
+        <div>
+          <div class="flex items-center justify-between gap-3">
+            <label for="in-password" class="label !mb-0">Password</label>
+            <button type="button" class="min-h-[44px] px-1 text-sm font-semibold text-lake underline" data-toggle-pw="in-password" aria-pressed="false">Show</button>
+          </div>
+          <input id="in-password" name="password" type="password" class="input mt-1.5" autocomplete="current-password" required maxlength="100" />
+          <p class="field-error" id="in-password-error" hidden></p>
+        </div>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <button type="submit" class="btn btn-lake w-full sm:w-auto sm:min-w-[180px]">Sign in</button>
+          <button type="button" class="min-h-[44px] text-left text-[0.97rem] font-semibold text-lake underline sm:text-right" data-forgot>Forgot your password?</button>
+        </div>
+        <p class="rounded-2xl bg-mist p-4 text-[0.95rem]" data-forgot-note hidden role="status">In the real portal we email you a link to choose a new password. This is a sample, so nothing is sent.</p>
+      </form>
+
+      <!-- Create account -->
+      <form data-form="signup" novalidate class="mt-6 space-y-5" hidden>
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label for="up-name" class="label">Your name</label>
+            <input id="up-name" name="name" type="text" class="input" autocomplete="name" required maxlength="80" />
+            <p class="field-error" id="up-name-error" hidden></p>
+          </div>
+          <div>
+            <label for="up-unit" class="label">Your unit</label>
+            <select id="up-unit" name="unit" class="input" required>
+              <option value="">Choose your unit</option>
+              {payUnits.map((u) => <option value={u.id}>{u.label}</option>)}
+            </select>
+            <p class="field-error" id="up-unit-error" hidden></p>
+          </div>
+        </div>
+        <div>
+          <label for="up-email" class="label">Email</label>
+          <input id="up-email" name="email" type="email" class="input" autocomplete="email" required maxlength="120" />
+          <p class="field-error" id="up-email-error" hidden></p>
+        </div>
+        <div>
+          <div class="flex items-center justify-between gap-3">
+            <label for="up-password" class="label !mb-0">Create a password</label>
+            <button type="button" class="min-h-[44px] px-1 text-sm font-semibold text-lake underline" data-toggle-pw="up-password" aria-pressed="false">Show</button>
+          </div>
+          <input id="up-password" name="password" type="password" class="input mt-1.5" autocomplete="new-password" required maxlength="100" aria-describedby="up-password-hint" data-hint="up-password-hint" />
+          <span class="hint" id="up-password-hint">At least 8 characters.</span>
+          <p class="field-error" id="up-password-error" hidden></p>
+        </div>
+        <button type="submit" class="btn btn-lake w-full sm:w-auto sm:min-w-[200px]">Create account</button>
+      </form>
+
+      <p class="mt-6 flex gap-3 rounded-2xl border-2 border-glow bg-[#FFF6E0] p-4 text-[0.95rem]">
+        <Icon name="info" class="mt-0.5 h-5 w-5 shrink-0" />
+        <span><strong>Sample only.</strong> Any email and password work. Nothing is stored or sent, and your password is never kept.</span>
+      </p>
+    </div>
+
+    <aside class="space-y-5 lg:sticky lg:top-24" aria-label="About the tenant portal">
+      <div class="card-mist p-6">
+        <p class="font-display text-xl font-bold text-lake">What you can do</p>
+        <ul class="mt-3 space-y-2">
+          <li class="flex gap-3"><Icon name="check" class="mt-1 h-5 w-5 shrink-0 text-shore" />See your rent and what is due</li>
+          <li class="flex gap-3"><Icon name="check" class="mt-1 h-5 w-5 shrink-0 text-shore" />Pay by bank transfer or card</li>
+          <li class="flex gap-3"><Icon name="check" class="mt-1 h-5 w-5 shrink-0 text-shore" />Turn on autopay</li>
+          <li class="flex gap-3"><Icon name="check" class="mt-1 h-5 w-5 shrink-0 text-shore" />Look back at past payments</li>
+          <li class="flex gap-3"><Icon name="check" class="mt-1 h-5 w-5 shrink-0 text-shore" />Track maintenance requests</li>
+        </ul>
+      </div>
+      <div class="card-mist p-6">
+        <p class="font-display text-xl font-bold text-lake">Prefer to mail a check?</p>
+        <p class="mt-1">Send it to {site.mailing.poBox}, {site.mailing.city}, {site.mailing.state} {site.mailing.zip}. <a href={href('/tenants#pay-rent')} class="font-semibold text-lake underline">See mailing details</a>.</p>
+      </div>
+      <div class="card-mist p-6">
+        <p class="font-display text-xl font-bold text-lake">Need help signing in?</p>
+        <p class="mt-1">Call <a href={phoneHref} class="font-semibold text-lake underline">{managerName} at {site.phone}</a>.</p>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ============ Signed in ============ -->
+  <div data-view="app" hidden>
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h2 tabindex="-1" data-heading data-app-title class="text-3xl sm:text-4xl">Hi</h2>
+        <p class="mt-1 flex flex-wrap items-center gap-2 text-muted">
+          <span class="rounded-full bg-mist px-3 py-1 text-sm font-semibold text-lake" data-bind="home"></span>
+          <span data-bind="email"></span>
+        </p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="rounded-full bg-glow px-3 py-1 text-xs font-bold uppercase tracking-wide text-ink">Design sample</span>
+        <button type="button" class="btn btn-line !min-h-[44px]" data-signout>Sign out</button>
+      </div>
+    </div>
+
+    <div class="mt-8 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
+      <div>
+        <ol class="mb-6 grid grid-cols-3 gap-2 text-sm font-semibold" data-stepper aria-label="Progress" hidden>
+          {['Payment method', 'Review', 'Secure checkout'].map((label, i) => (
+            <li class="step" data-step={i + 1}>
+              <span class="step-dot">{i + 1}</span>
+              <span>{label}</span>
+            </li>
+          ))}
+        </ol>
+
+        <!-- Dashboard -->
+        <section data-panel="dash" class="space-y-5">
+          <div class="on-dark hero-bg relative grid gap-8 overflow-hidden rounded-3xl p-6 text-white md:grid-cols-[1fr_auto] md:items-end md:p-9">
+            <div>
+              <p class="text-sky" data-balance-label>Rent due</p>
+              <p class="mt-1 font-display text-5xl font-bold text-white sm:text-6xl" data-bind="rent-amount"></p>
+              <p class="mt-2 text-sky" data-balance-note></p>
+              <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+                <button type="button" class="btn btn-glow" data-go="method" data-pay-button><Icon name="lock" class="h-5 w-5" />Pay now</button>
+                <span class="inline-flex min-h-[52px] items-center gap-2 rounded-full border-2 border-sky px-6 font-semibold text-white" data-paid-pill hidden><Icon name="check" class="h-5 w-5" />Paid, thank you</span>
+              </div>
+            </div>
+            <dl class="grid grid-cols-2 gap-x-8 gap-y-4 border-t border-white/20 pt-5 md:min-w-[14rem] md:grid-cols-1 md:border-l md:border-t-0 md:pl-8 md:pt-0">
+              <div><dt class="text-sm text-sky">Home</dt><dd class="font-display text-lg font-bold text-white" data-bind="home"></dd></div>
+              <div><dt class="text-sm text-sky">Monthly rent</dt><dd class="font-display text-lg font-bold text-white" data-bind="rent"></dd></div>
+              <div><dt class="text-sm text-sky">Due date</dt><dd class="font-display text-lg font-bold text-white" data-bind="due"></dd></div>
+            </dl>
+          </div>
+
+          <div class="card flex items-center justify-between gap-5 p-6">
+            <div>
+              <p class="font-display text-xl font-bold text-lake">Autopay</p>
+              <p class="mt-1" data-autopay-text></p>
+            </div>
+            <button type="button" role="switch" aria-checked="false" aria-label="Autopay" class="switch" data-autopay><span></span></button>
+          </div>
+
+          <div class="card overflow-hidden">
+            <p class="px-6 pt-6 font-display text-xl font-bold text-lake">Payment history</p>
+            <div class="overflow-x-auto p-2 pb-4">
+              <table class="w-full min-w-[30rem] text-left">
+                <caption class="sr-only">Sample payment history</caption>
+                <thead>
+                  <tr class="text-sm text-muted">
+                    <th scope="col" class="px-4 py-2 font-semibold">Date</th>
+                    <th scope="col" class="px-4 py-2 font-semibold">Method</th>
+                    <th scope="col" class="px-4 py-2 font-semibold">Amount</th>
+                    <th scope="col" class="px-4 py-2 font-semibold">Status</th>
+                  </tr>
+                </thead>
+                <tbody data-history-body></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card p-6">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <p class="font-display text-xl font-bold text-lake">Maintenance requests</p>
+              <a href={href('/tenants#maintenance')} class="btn btn-line !min-h-[44px] !px-4 text-[0.95rem]"><Icon name="wrench" class="h-5 w-5" />New request</a>
+            </div>
+            <ul class="mt-4 divide-y divide-sky" data-requests-list></ul>
+          </div>
+        </section>
+
+        <!-- Payment method -->
+        <form data-panel="method" data-form="method" hidden novalidate class="card space-y-6 p-6 md:p-9">
+          <h2 tabindex="-1" data-heading class="text-2xl sm:text-3xl">How would you like to pay?</h2>
+          <fieldset class="space-y-3">
+            <legend class="sr-only">Payment method</legend>
+            <label class="choice flex-wrap sm:flex-nowrap">
+              <input type="radio" name="method" value="bank" checked class="mt-1 h-5 w-5 accent-[#0F3B4C]" />
+              <Icon name="bank" class="mt-0.5 h-6 w-6 shrink-0 text-lake" />
+              <span class="min-w-0 grow basis-32">
+                <span class="block font-display text-xl font-bold text-lake">Bank transfer</span>
+                <span class="block text-[0.97rem]">Pay from your checking account. No fee to you.</span>
+                <span class="mt-1 inline-block rounded-full bg-glow px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-ink">Recommended</span>
+              </span>
+              <span class="basis-full pl-[4.75rem] font-display text-xl font-bold text-lake sm:basis-auto sm:pl-0 sm:text-right" data-bind="total-bank"></span>
+            </label>
+            <label class="choice flex-wrap sm:flex-nowrap">
+              <input type="radio" name="method" value="card" class="mt-1 h-5 w-5 accent-[#0F3B4C]" />
+              <Icon name="card" class="mt-0.5 h-6 w-6 shrink-0 text-lake" />
+              <span class="min-w-0 grow basis-32">
+                <span class="block font-display text-xl font-bold text-lake">Debit or credit card</span>
+                <span class="block text-[0.97rem]">A card fee of <span data-bind="fee-card"></span> is added.</span>
+              </span>
+              <span class="basis-full pl-[4.75rem] font-display text-xl font-bold text-lake sm:basis-auto sm:pl-0 sm:text-right" data-bind="total-card"></span>
+            </label>
+          </fieldset>
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <button type="button" class="btn btn-line" data-go="dash">Back to dashboard</button>
+            <button type="submit" class="btn btn-lake">Continue</button>
+          </div>
+        </form>
+
+        <!-- Review -->
+        <section data-panel="review" hidden class="card space-y-6 p-6 md:p-9">
+          <h2 tabindex="-1" data-heading class="text-2xl sm:text-3xl">Review your payment</h2>
+          <dl class="divide-y divide-sky rounded-2xl border border-sky">
+            <div class="flex justify-between gap-4 p-4"><dt class="text-muted">Home</dt><dd class="font-semibold" data-bind="home"></dd></div>
+            <div class="flex justify-between gap-4 p-4"><dt class="text-muted">Name</dt><dd class="font-semibold" data-bind="name"></dd></div>
+            <div class="flex justify-between gap-4 p-4"><dt class="text-muted">Paying by</dt><dd class="font-semibold" data-bind="method"></dd></div>
+            <div class="flex justify-between gap-4 p-4"><dt class="text-muted">Rent</dt><dd class="font-semibold" data-bind="rent"></dd></div>
+            <div class="flex justify-between gap-4 p-4"><dt class="text-muted">Fee</dt><dd class="font-semibold" data-bind="fee"></dd></div>
+            <div class="flex justify-between gap-4 bg-mist p-4"><dt class="font-bold">Total</dt><dd class="font-display text-2xl font-bold text-lake" data-bind="total"></dd></div>
+          </dl>
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <button type="button" class="btn btn-line" data-go="method">Back</button>
+            <button type="button" class="btn btn-glow" data-go="checkout"><Icon name="lock" class="h-5 w-5" />Continue to secure checkout</button>
+          </div>
+          <p class="text-sm text-muted">In the real site you are sent to a payment page hosted by Stripe. Your bank or card details are entered there, never on this website.</p>
+        </section>
+
+        <!-- Checkout (sample of the page Stripe hosts) -->
+        <section data-panel="checkout" hidden class="overflow-hidden rounded-3xl border border-sky" style="box-shadow: 0 18px 40px -28px var(--lake)">
+          <div class="flex items-center gap-2 bg-mist px-4 py-2.5 text-sm font-semibold text-lake">
+            <Icon name="lock" class="h-4 w-4" />
+            <span>Sample of the secure page Stripe hosts</span>
+          </div>
+          <div class="grid md:grid-cols-[0.9fr_1.1fr]">
+            <div class="on-dark hero-bg p-7 text-white md:p-9">
+              <h2 tabindex="-1" data-heading class="text-xl text-white">{site.name}</h2>
+              <p class="mt-1 text-sky">Pay rent for <span data-bind="home"></span></p>
+              <p class="mt-6 font-display text-5xl font-bold text-white" data-bind="total"></p>
+              <dl class="mt-8 space-y-2 border-t border-white/20 pt-4 text-[0.97rem] text-sky">
+                <div class="flex justify-between"><dt>Rent</dt><dd data-bind="rent"></dd></div>
+                <div class="flex justify-between"><dt>Fee</dt><dd data-bind="fee"></dd></div>
+              </dl>
+            </div>
+            <form data-form="checkout" novalidate class="space-y-5 bg-white p-7 md:p-9">
+              <div>
+                <label for="co-email" class="label">Email for your receipt</label>
+                <input id="co-email" name="email" type="email" class="input" autocomplete="email" required maxlength="120" />
+                <p class="field-error" id="co-email-error" hidden></p>
+              </div>
+              <div data-pay-bank class="space-y-3">
+                <p class="label">Pay with your bank</p>
+                <button type="button" class="btn btn-line w-full" data-connect><Icon name="bank" class="h-5 w-5" /><span data-connect-label>Connect your bank</span></button>
+                <p class="text-sm text-muted">You choose your bank and sign in on a secure screen. This sample uses a pretend account.</p>
+              </div>
+              <div data-pay-card class="space-y-3" hidden>
+                <p class="label">Card details</p>
+                <input class="input" disabled placeholder="1234 1234 1234 1234" aria-label="Card number (sample, disabled)" />
+                <div class="grid grid-cols-2 gap-3">
+                  <input class="input" disabled placeholder="MM / YY" aria-label="Expiry (sample, disabled)" />
+                  <input class="input" disabled placeholder="CVC" aria-label="CVC (sample, disabled)" />
+                </div>
+                <p class="text-sm text-muted">Sample only: these fields are switched off and never collect anything.</p>
+              </div>
+              <p class="field-error" id="co-bank-error" hidden></p>
+              <button type="submit" class="btn btn-lake w-full"><Icon name="lock" class="h-5 w-5" />Pay <span data-bind="total"></span></button>
+              <button type="button" class="block w-full text-center text-sm font-semibold text-lake underline" data-go="review">Back to review</button>
+            </form>
+          </div>
+        </section>
+
+        <!-- Receipt -->
+        <section data-panel="receipt" hidden class="card space-y-6 p-6 text-center md:p-10">
+          <span class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-lake text-white"><Icon name="check" class="h-8 w-8" /></span>
+          <div>
+            <h2 tabindex="-1" data-heading class="text-3xl sm:text-4xl">Payment received</h2>
+            <p class="mt-2 text-lg">Thank you, <span data-bind="first"></span>. A receipt was sent to <strong data-bind="receipt-email"></strong>.</p>
+          </div>
+          <dl class="mx-auto max-w-sm divide-y divide-sky rounded-2xl border border-sky text-left">
+            <div class="flex justify-between gap-4 p-4"><dt class="text-muted">Home</dt><dd class="font-semibold" data-bind="home"></dd></div>
+            <div class="flex justify-between gap-4 p-4"><dt class="text-muted">Paid</dt><dd class="font-semibold" data-bind="total"></dd></div>
+            <div class="flex justify-between gap-4 p-4"><dt class="text-muted">Date</dt><dd class="font-semibold" data-bind="today"></dd></div>
+            <div class="flex justify-between gap-4 p-4"><dt class="text-muted">Confirmation</dt><dd class="font-semibold">SAMPLE-1042</dd></div>
+          </dl>
+          <div class="flex flex-col justify-center gap-3 sm:flex-row">
+            <button type="button" class="btn btn-glow" data-go="dash">Back to dashboard</button>
+            <button type="button" class="btn btn-line" data-turn-on-autopay><Icon name="repeat" class="h-5 w-5" />Turn on autopay</button>
+          </div>
+        </section>
+      </div>
+
+      <aside class="space-y-5 lg:sticky lg:top-24" aria-label="Help">
+        <div class="card-mist p-6">
+          <p class="font-display text-xl font-bold text-lake">Questions about your rent?</p>
+          <p class="mt-1">Call or text <a href={phoneHref} class="font-semibold text-lake underline">{managerName} at {site.phone}</a>.</p>
+        </div>
+        <div class="card-mist p-6">
+          <p class="font-display text-xl font-bold text-lake">Prefer to mail a check?</p>
+          <p class="mt-1">Send it to {site.mailing.poBox}, {site.mailing.city}, {site.mailing.state} {site.mailing.zip}. <a href={href('/tenants#pay-rent')} class="font-semibold text-lake underline">See mailing details</a>.</p>
+        </div>
+        <div class="card-mist p-6">
+          <p class="font-display text-xl font-bold text-lake">In an emergency</p>
+          <p class="mt-1">If anyone is in danger, call 911 first.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <noscript>
+    <p class="mt-6 rounded-2xl border-2 border-glow bg-[#FFF6E0] p-5">Turn on JavaScript to try the sample tenant portal, or call <a href={phoneHref} class="font-semibold text-lake underline">{managerName} at {site.phone}</a>.</p>
+  </noscript>
+</div>
+
+<script>
+  import { cleanLine } from '../lib/sanitize';
+
+  const app = document.getElementById('portal');
+  if (app) {
+    type Unit = { id: string; label: string; rent: number };
+    type Session = { name: string; email: string; unitId: string; paid: boolean; autopay: boolean; payments: { date: string; method: string; amount: number }[] };
+
+    const units: Unit[] = JSON.parse(app.dataset.units ?? '[]');
+    const due = app.dataset.due ?? '';
+    const percent = Number(app.dataset.cardPercent);
+    const flat = Number(app.dataset.cardFlat);
+    const history: { date: string; method: string; status: string }[] = JSON.parse(app.dataset.history ?? '[]');
+    const requests: { id: string; date: string; title: string; status: string }[] = JSON.parse(app.dataset.requests ?? '[]');
+    const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+    const reduce = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const KEY = 'slp-portal-session';
+
+    // The sample "session": a name, email and unit only. Never a password.
+    let session: Session | null = null;
+    try { session = JSON.parse(sessionStorage.getItem(KEY) ?? 'null'); } catch { session = null; }
+    const save = () => { try { session ? sessionStorage.setItem(KEY, JSON.stringify(session)) : sessionStorage.removeItem(KEY); } catch { /* ignore */ } };
+
+    let method: 'bank' | 'card' = 'bank';
+    let bankConnected = false;
+
+    const $ = <T extends HTMLElement>(sel: string) => app.querySelector<T>(sel)!;
+    const views = { auth: $('[data-view="auth"]'), app: $('[data-view="app"]') };
+    const panels = [...app.querySelectorAll<HTMLElement>('[data-panel]')];
+    const stepOf: Record<string, number> = { method: 1, review: 2, checkout: 3 };
+
+    const unit = () => units.find((u) => u.id === session?.unitId) ?? units[0];
+    const feeFor = (rent: number, m: 'bank' | 'card') => (m === 'card' ? Math.round((rent * percent + flat) * 100) / 100 : 0);
+    const bind = (key: string, value: string) => app.querySelectorAll<HTMLElement>(`[data-bind="${key}"]`).forEach((n) => (n.textContent = value));
+    const el = (tag: string, cls: string, text?: string) => {
+      const n = document.createElement(tag);
+      n.className = cls;
+      if (text) n.textContent = text;
+      return n;
+    };
+
+    function render() {
+      if (!session) return;
+      const u = unit();
+      const fee = feeFor(u.rent, method);
+      const todayText = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      const first = session.name.split(' ')[0] ?? '';
+      $('[data-app-title]').textContent = `Hi, ${first}`;
+      bind('home', u.label);
+      bind('due', due);
+      bind('name', session.name);
+      bind('first', first);
+      bind('email', session.email);
+      bind('rent', usd.format(u.rent));
+      bind('rent-amount', usd.format(session.paid ? 0 : u.rent));
+      bind('fee-card', usd.format(feeFor(u.rent, 'card')));
+      bind('total-bank', usd.format(u.rent));
+      bind('total-card', usd.format(u.rent + feeFor(u.rent, 'card')));
+      bind('method', method === 'bank' ? 'Bank transfer' : 'Card');
+      bind('fee', fee ? usd.format(fee) : 'None');
+      bind('total', usd.format(u.rent + fee));
+      bind('today', todayText);
+      $<HTMLInputElement>('#co-email').value ||= session.email;
+      bind('receipt-email', $<HTMLInputElement>('#co-email').value || session.email);
+
+      // Balance card
+      $('[data-balance-label]').textContent = session.paid ? 'Nothing due right now' : `Rent due ${due}`;
+      $('[data-balance-note]').textContent = session.paid
+        ? `You are paid up. Next rent of ${usd.format(u.rent)} is due after ${due}.`
+        : `${u.label}, monthly rent ${usd.format(u.rent)}.`;
+      $<HTMLElement>('[data-pay-button]').hidden = session.paid;
+      $<HTMLElement>('[data-paid-pill]').hidden = !session.paid;
+
+      // Autopay
+      $('[data-autopay]').setAttribute('aria-checked', String(session.autopay));
+      $('[data-autopay-text]').textContent = session.autopay
+        ? `On. ${usd.format(u.rent)} is paid from Sample Bank on the 1st of each month, and a receipt is emailed.`
+        : 'Off. Turn it on and rent is paid on time every month.';
+
+      // History
+      const body = $('[data-history-body]');
+      body.replaceChildren();
+      const rows = [
+        ...session.payments.map((p) => ({ date: p.date, method: p.method, amount: p.amount, status: 'Paid' })),
+        ...history.map((h) => ({ date: h.date, method: h.method, amount: u.rent, status: h.status })),
+      ];
+      for (const r of rows) {
+        const tr = el('tr', 'border-t border-sky');
+        tr.append(el('td', 'px-4 py-3', r.date), el('td', 'px-4 py-3', r.method), el('td', 'px-4 py-3 font-semibold', usd.format(r.amount)));
+        const td = el('td', 'px-4 py-3');
+        td.append(el('span', 'rounded-full bg-mist px-3 py-1 text-sm font-semibold text-lake', r.status));
+        tr.append(td);
+        body.append(tr);
+      }
+
+      // Requests
+      const list = $('[data-requests-list]');
+      list.replaceChildren();
+      for (const r of requests) {
+        const li = el('li', 'flex items-start justify-between gap-4 py-3');
+        const left = el('div', '');
+        left.append(el('p', 'font-semibold', r.title), el('p', 'text-sm text-muted', `${r.id}, ${r.date}`));
+        li.append(left, el('span', 'shrink-0 rounded-full bg-mist px-3 py-1 text-sm font-semibold text-lake', r.status));
+        list.append(li);
+      }
+
+      $<HTMLElement>('[data-pay-bank]').hidden = method !== 'bank';
+      $<HTMLElement>('[data-pay-card]').hidden = method !== 'card';
+    }
+
+    function showPanel(name: string, initial = false) {
+      render();
+      panels.forEach((p) => (p.hidden = p.dataset.panel !== name));
+      const stepper = $('[data-stepper]');
+      stepper.hidden = !(name in stepOf);
+      stepper.querySelectorAll<HTMLElement>('[data-step]').forEach((s) => {
+        const n = Number(s.dataset.step);
+        s.setAttribute('data-state', n < stepOf[name] ? 'done' : n === stepOf[name] ? 'current' : 'todo');
+        if (n === stepOf[name]) s.setAttribute('aria-current', 'step');
+        else s.removeAttribute('aria-current');
+      });
+      if (initial) return;
+      (app as HTMLElement).scrollIntoView({ block: 'start', behavior: reduce() ? 'auto' : 'smooth' });
+      panels.find((p) => p.dataset.panel === name)?.querySelector<HTMLElement>('[data-heading]')?.focus({ preventScroll: true });
+    }
+
+    function showView(name: 'auth' | 'app', initial = false) {
+      views.auth.hidden = name !== 'auth';
+      views.app.hidden = name !== 'app';
+      if (name === 'app') showPanel('dash', initial);
+      else if (!initial) {
+        (app as HTMLElement).scrollIntoView({ block: 'start', behavior: reduce() ? 'auto' : 'smooth' });
+        views.auth.querySelector<HTMLElement>('[data-heading]')?.focus({ preventScroll: true });
+      }
+    }
+
+    function fail(input: HTMLElement, msg: string) {
+      const err = document.getElementById(`${input.id}-error`)!;
+      err.textContent = msg;
+      err.hidden = false;
+      input.setAttribute('aria-invalid', 'true');
+      input.setAttribute('aria-describedby', [err.id, input.getAttribute('data-hint')].filter(Boolean).join(' '));
+    }
+    function reset(form: HTMLFormElement) {
+      form.querySelectorAll<HTMLElement>('input, select').forEach((i) => {
+        i.removeAttribute('aria-invalid');
+        if (i.id === 'up-password') i.setAttribute('aria-describedby', 'up-password-hint');
+        else i.removeAttribute('aria-describedby');
+      });
+      form.querySelectorAll<HTMLElement>('.field-error').forEach((e) => {
+        e.hidden = true;
+        e.textContent = '';
+      });
+    }
+    const validEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+    const titleCase = (s: string) => s.replace(/[._-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()).trim();
+
+    function signIn(s: Session) {
+      session = s;
+      method = 'bank';
+      bankConnected = false;
+      $('[data-connect-label]').textContent = 'Connect your bank';
+      save();
+      showView('app');
+    }
+
+    // Auth mode toggle
+    const setMode = (mode: string) => {
+      const signup = mode === 'signup';
+      app.querySelector<HTMLElement>('[data-form="signin"]')!.hidden = signup;
+      app.querySelector<HTMLElement>('[data-form="signup"]')!.hidden = !signup;
+      $('[data-auth-title]').textContent = signup ? 'Create your account' : 'Sign in to your account';
+    };
+    app.querySelectorAll<HTMLInputElement>('input[name="auth-mode"]').forEach((r) => r.addEventListener('change', () => setMode(r.value)));
+
+    app.addEventListener('click', (e) => {
+      const t = e.target as Element;
+      const pw = t.closest<HTMLElement>('[data-toggle-pw]');
+      if (pw) {
+        const input = document.getElementById(pw.dataset.togglePw!) as HTMLInputElement;
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        pw.textContent = show ? 'Hide' : 'Show';
+        pw.setAttribute('aria-pressed', String(show));
+        return;
+      }
+      if (t.closest('[data-forgot]')) {
+        $('[data-forgot-note]').hidden = false;
+        return;
+      }
+      const go = t.closest<HTMLElement>('[data-go]');
+      if (go) return showPanel(go.dataset.go!);
+      if (t.closest('[data-connect]')) {
+        bankConnected = true;
+        $('[data-connect-label]').textContent = 'Connected, ending 6789';
+        $('#co-bank-error').hidden = true;
+        return;
+      }
+      if (t.closest('[data-autopay]') && session) {
+        session.autopay = !session.autopay;
+        save();
+        return render();
+      }
+      if (t.closest('[data-turn-on-autopay]') && session) {
+        session.autopay = true;
+        save();
+        return showPanel('dash');
+      }
+      if (t.closest('[data-signout]')) {
+        session = null;
+        save();
+        app.querySelectorAll<HTMLFormElement>('form').forEach((f) => f.reset());
+        $<HTMLInputElement>('#co-email').value = '';
+        return showView('auth');
+      }
+    });
+
+    app.querySelectorAll<HTMLInputElement>('input[name="method"]').forEach((r) =>
+      r.addEventListener('change', () => {
+        method = r.value === 'card' ? 'card' : 'bank';
+        render();
+      }),
+    );
+
+    app.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      reset(form);
+      const val = (n: string) => cleanLine((form.elements.namedItem(n) as HTMLInputElement | null)?.value ?? '', 120);
+      const field = (id: string) => form.querySelector<HTMLElement>(`#${id}`)!;
+
+      switch (form.dataset.form) {
+        case 'signin': {
+          const email = val('email');
+          const pass = (form.elements.namedItem('password') as HTMLInputElement).value;
+          let first: HTMLElement | null = null;
+          if (!validEmail(email)) { fail(field('in-email'), 'Enter a valid email address.'); first ??= field('in-email'); }
+          if (!pass) { fail(field('in-password'), 'Enter your password.'); first ??= field('in-password'); }
+          if (first) return first.focus();
+          (form.elements.namedItem('password') as HTMLInputElement).value = '';
+          // Sample: anyone can sign in. Use the email to make up a name and give them a unit.
+          return signIn({ name: titleCase(email.split('@')[0]) || 'Resident', email, unitId: units.find((u) => u.id === '2a')?.id ?? units[0].id, paid: false, autopay: false, payments: [] });
+        }
+        case 'signup': {
+          const name = val('name');
+          const unitId = val('unit');
+          const email = val('email');
+          const pass = (form.elements.namedItem('password') as HTMLInputElement).value;
+          let first: HTMLElement | null = null;
+          if (name.length < 2) { fail(field('up-name'), 'Enter your name.'); first ??= field('up-name'); }
+          if (!units.some((u) => u.id === unitId)) { fail(field('up-unit'), 'Choose your unit.'); first ??= field('up-unit'); }
+          if (!validEmail(email)) { fail(field('up-email'), 'Enter a valid email address.'); first ??= field('up-email'); }
+          if (pass.length < 8) { fail(field('up-password'), 'Use at least 8 characters.'); first ??= field('up-password'); }
+          if (first) return first.focus();
+          (form.elements.namedItem('password') as HTMLInputElement).value = '';
+          return signIn({ name, email, unitId, paid: false, autopay: false, payments: [] });
+        }
+        case 'method':
+          return showPanel('review');
+        case 'checkout': {
+          const email = val('email');
+          if (!validEmail(email)) { fail(field('co-email'), 'Enter a valid email address.'); return field('co-email').focus(); }
+          if (method === 'bank' && !bankConnected) {
+            const err = $('#co-bank-error');
+            err.textContent = 'Connect your bank to continue.';
+            err.hidden = false;
+            return;
+          }
+          if (session) {
+            const u = unit();
+            session.paid = true;
+            session.payments.unshift({
+              date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
+              method: method === 'bank' ? 'Bank transfer' : 'Card',
+              amount: u.rent + feeFor(u.rent, method),
+            });
+            save();
+          }
+          return showPanel('receipt');
+        }
+      }
+    });
+
+    if (session) showView('app', true);
+    else showView('auth', true);
+  }
+</script>

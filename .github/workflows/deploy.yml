@@ -41,7 +41,6 @@ jobs:
           PUBLIC_EMAILJS_INQUIRY_TEMPLATE_ID: ${{ vars.PUBLIC_EMAILJS_INQUIRY_TEMPLATE_ID }}
           PUBLIC_EMAILJS_PUBLIC_KEY: ${{ vars.PUBLIC_EMAILJS_PUBLIC_KEY }}
           PUBLIC_VACANCIES_CSV_URL: ${{ vars.PUBLIC_VACANCIES_CSV_URL }}
-          PUBLIC_APPLY_FORM_URL: ${{ vars.PUBLIC_APPLY_FORM_URL }}
 
       - name: Verify
         run: npm run verify

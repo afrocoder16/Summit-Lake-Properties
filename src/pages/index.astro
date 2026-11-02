@@ -4,7 +4,8 @@ import Announcement from '../components/Announcement.astro';
 import Contours from '../components/Contours.astro';
 import Icon from '../components/Icon.astro';
 import CopyButton from '../components/CopyButton.astro';
-import { site, phoneHref, managerName, mailingText, href } from '../config/site';
+import { site, phoneHref, managerName, mailingText, href, smsHref } from '../config/site';
+import { homePhotos, sampleVacancies, residentBenefits, lifeInMarshall, moveSteps, faqs } from '../config/sample';
 
 const pillars = [
   { icon: 'phone', title: 'Responsive', text: 'You always know who to call and where to send a request.' },
@@ -12,14 +13,23 @@ const pillars = [
   { icon: 'shield', title: 'Safe and comfortable', text: 'The standard we aim for in every home in the building.' },
   { icon: 'wrench', title: 'Well maintained', text: 'Maintenance requests have a simple home online.' },
 ] as const;
+
+const facts = [
+  { icon: 'pin', title: 'Local management', text: `Based in ${site.city}, ${site.state}` },
+  { icon: 'phone', title: 'One number to call', text: site.phone },
+  { icon: 'lock', title: 'Tenant portal', text: 'Rent and repairs in one place' },
+  { icon: 'image', title: 'See every home', text: 'Photos of each available home' },
+] as const;
+
+const img = (p: { src: string }) => href(p.src);
 ---
-<Base description={`${site.name} now manages your building in ${site.city}, ${site.state}. Pay rent, request maintenance and reach ${managerName} at ${site.phone}.`}>
+<Base description={`${site.name} now manages your building in ${site.city}, ${site.state}. Sign in to the tenant portal, request maintenance, browse available homes and reach ${managerName} at ${site.phone}.`}>
   <Announcement slot="announcement" />
 
   <!-- Hero -->
   <section class="on-dark hero-bg relative isolate overflow-hidden text-white">
     <Contours id="home" class="absolute inset-0 -z-10 h-full w-full" />
-    <div class="container-x grid items-center gap-10 py-16 md:py-24 lg:grid-cols-[1.25fr_0.75fr] lg:py-32">
+    <div class="container-x grid items-center gap-10 py-16 md:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:py-28">
       <div>
         <p class="eyebrow text-glow">New management, effective immediately</p>
         <h1 class="mt-5 text-[2.6rem] text-white sm:text-6xl lg:text-7xl">Your building has new management</h1>
@@ -31,17 +41,36 @@ const pillars = [
             <Icon name="phone" class="h-5 w-5" />
             Call {managerName} {site.phone}
           </a>
-          <a href={href('/tenants')} class="btn btn-line-light">Pay rent or request maintenance</a>
+          <a href={href('/portal')} class="btn btn-line-light">Sign in to the tenant portal</a>
         </div>
       </div>
 
-      <aside class="glass rounded-3xl p-6 md:p-7" aria-labelledby="who-to-call">
-        <h2 id="who-to-call" class="text-2xl text-white">Who to call</h2>
-        <p class="mt-1 text-sky">For questions, concerns, maintenance or other matters, contact {managerName}.</p>
-        <a href={phoneHref} class="mt-4 inline-block py-1 font-display text-3xl font-bold text-glow sm:text-4xl">{site.phone}</a>
-        <p class="mt-4 border-t border-white/15 pt-4 text-sm text-sky">In an emergency, call 911 first.</p>
+      <aside class="relative lg:min-h-[460px] lg:overflow-hidden lg:rounded-3xl" aria-labelledby="who-to-call">
+        <img src={img(homePhotos.hero)} alt={homePhotos.hero.alt} width="1400" height="933" fetchpriority="high" decoding="async" class="h-48 w-full rounded-3xl object-cover sm:h-64 lg:absolute lg:inset-0 lg:h-full" />
+        <div class="absolute inset-0 hidden lg:block" style="background: linear-gradient(0deg, transparent 45%, color-mix(in srgb, var(--deep) 80%, transparent))" aria-hidden="true"></div>
+        <div class="glass relative mt-4 rounded-3xl p-6 md:p-7 lg:absolute lg:inset-x-4 lg:top-4 lg:mt-0">
+          <h2 id="who-to-call" class="text-2xl text-white">Who to call</h2>
+          <p class="mt-1 text-sky">For questions, concerns, maintenance or other matters, contact {managerName}.</p>
+          <a href={phoneHref} class="mt-4 inline-block py-1 font-display text-3xl font-bold text-glow sm:text-4xl">{site.phone}</a>
+          <p class="mt-4 border-t border-white/15 pt-4 text-sm text-sky">In an emergency, call 911 first.</p>
+        </div>
       </aside>
     </div>
+  </section>
+
+  <!-- Quick facts -->
+  <section class="border-b border-sky bg-white" aria-label="At a glance">
+    <ul class="container-x grid gap-x-6 gap-y-5 py-7 sm:grid-cols-2 lg:grid-cols-4">
+      {facts.map((f) => (
+        <li class="flex items-center gap-4">
+          <span class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-mist text-lake"><Icon name={f.icon} /></span>
+          <span>
+            <span class="block font-display text-lg font-bold leading-tight text-lake">{f.title}</span>
+            <span class="block text-[0.95rem] text-muted">{f.text}</span>
+          </span>
+        </li>
+      ))}
+    </ul>
   </section>
 
   <!-- What tenants need to know -->
@@ -71,7 +100,7 @@ const pillars = [
           </address>
           <div class="mt-4 flex flex-wrap gap-2">
             <CopyButton text={mailingText} class="btn btn-line !min-h-[48px] !px-5" />
-            <a href={href('/tenants#pay-rent')} class="btn !min-h-[48px] !px-4 text-lake underline">How to pay</a>
+            <a href={href('/portal')} class="btn !min-h-[48px] !px-4 text-lake underline">Pay online</a>
           </div>
         </article>
 
@@ -84,6 +113,72 @@ const pillars = [
             {site.phone}
           </a>
         </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured homes (sample) -->
+  <section class="section" aria-labelledby="featured">
+    <div class="container-x">
+      <div class="reveal flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div class="max-w-2xl">
+          <p class="eyebrow">Sample homes</p>
+          <h2 id="featured" class="mt-4 text-3xl sm:text-4xl md:text-5xl">Find your next home</h2>
+          <p class="mt-4 text-lg">A look at how available homes will appear. Tap any home for all of its photos.</p>
+        </div>
+        <a href={href('/vacancies')} class="btn btn-line self-start sm:self-auto">See all homes</a>
+      </div>
+
+      <ul class="mt-10 grid gap-5 md:grid-cols-3">
+        {sampleVacancies.map((v) => (
+          <li class="reveal">
+            <a href={href(`/vacancies#home-${v.id}`)} class="card group block h-full overflow-hidden no-underline transition hover:-translate-y-1">
+              <span class="relative block aspect-[3/2] overflow-hidden bg-sky">
+                <img src={img(v.photos[0])} alt={v.photos[0].alt} width="1200" height="800" loading="lazy" decoding="async" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                <span class="absolute left-4 top-4 rounded-full bg-glow px-3 py-1 text-xs font-bold uppercase tracking-wide text-ink">Sample listing</span>
+              </span>
+              <span class="block p-6">
+                <span class="block font-display text-2xl font-bold text-lake">{v.unit}</span>
+                <span class="mt-1 block text-muted">{v.bedrooms} bed, {v.bathrooms} bath · Available {v.available}</span>
+                <span class="mt-3 block font-display text-3xl font-bold text-lake">${v.rent} <span class="text-base font-semibold text-muted">per month</span></span>
+                <span class="mt-4 inline-flex items-center gap-1 font-semibold text-lake">View photos <Icon name="chevron-right" class="h-5 w-5" /></span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Living here (sample) -->
+  <section class="section bg-mist" aria-labelledby="living">
+    <div class="container-x grid items-center gap-12 lg:grid-cols-2">
+      <div class="reveal relative">
+        <img src={img(homePhotos.house)} alt={homePhotos.house.alt} width="1200" height="800" loading="lazy" decoding="async" class="aspect-[4/3] w-full rounded-3xl object-cover" style="box-shadow: 0 30px 60px -30px var(--lake)" />
+        <div class="card absolute -bottom-6 left-4 right-4 flex items-center gap-4 p-4 sm:left-auto sm:right-6 sm:max-w-xs">
+          <span class="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-glow text-ink"><Icon name="phone" /></span>
+          <span>
+            <span class="block font-display text-lg font-bold leading-tight text-lake">Questions about your home?</span>
+            <a href={phoneHref} class="inline-flex min-h-[44px] items-center font-semibold text-lake underline">{site.phone}</a>
+          </span>
+        </div>
+      </div>
+
+      <div class="reveal mt-6 lg:mt-0 lg:pl-4">
+        <p class="eyebrow">Sample content</p>
+        <h2 id="living" class="mt-4 text-3xl sm:text-4xl md:text-5xl">A home that is looked after</h2>
+        <p class="mt-4 text-lg">Good management should feel simple. Here is what residents can expect from us.</p>
+        <ul class="mt-8 grid gap-6 sm:grid-cols-2">
+          {residentBenefits.map((b) => (
+            <li class="flex gap-4">
+              <span class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-lake text-white"><Icon name={b.icon} /></span>
+              <span>
+                <span class="block font-display text-xl font-bold leading-tight text-lake">{b.title}</span>
+                <span class="mt-1 block text-[0.97rem]">{b.text}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   </section>
@@ -108,26 +203,86 @@ const pillars = [
     </div>
   </section>
 
-  <!-- Next steps -->
-  <section class="section" aria-labelledby="next">
+  <!-- Life in Marshall (sample) -->
+  <section class="section" aria-labelledby="life">
     <div class="container-x">
-      <h2 id="next" class="reveal text-3xl sm:text-4xl md:text-5xl">What would you like to do?</h2>
-      <div class="mt-10 grid gap-5 md:grid-cols-2">
-        <a href={href('/tenants#maintenance')} class="card reveal group flex items-start gap-5 p-7 no-underline transition hover:-translate-y-1">
-          <span class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-glow text-ink"><Icon name="wrench" class="h-7 w-7" /></span>
-          <span>
-            <span class="block font-display text-2xl font-bold text-lake">Request maintenance</span>
-            <span class="mt-1 block text-ink">Tell us what is wrong and the best time to reach you.</span>
-          </span>
-        </a>
-        <a href={href('/vacancies')} class="card reveal group flex items-start gap-5 p-7 no-underline transition hover:-translate-y-1">
-          <span class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-sky text-lake"><Icon name="home" class="h-7 w-7" /></span>
-          <span>
-            <span class="block font-display text-2xl font-bold text-lake">Looking for a home?</span>
-            <span class="mt-1 block text-ink">See current vacancies, then apply when you are ready.</span>
-          </span>
-        </a>
+      <div class="reveal max-w-2xl">
+        <p class="eyebrow">Sample photos and text</p>
+        <h2 id="life" class="mt-4 text-3xl sm:text-4xl md:text-5xl">Life in {site.city}</h2>
+        <p class="mt-4 text-lg">A small city with room to breathe, close to the outdoors.</p>
       </div>
+      <ul class="mt-10 grid gap-5 md:grid-cols-3">
+        {lifeInMarshall.map((c) => (
+          <li class="reveal group relative overflow-hidden rounded-3xl">
+            <img src={img(homePhotos[c.photo])} alt={homePhotos[c.photo].alt} width="1200" height="800" loading="lazy" decoding="async" class="aspect-[4/5] w-full object-cover transition duration-700 group-hover:scale-105" />
+            <span class="absolute inset-x-0 bottom-0 block p-6 text-white" style="background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--deep) 88%, transparent))">
+              <span class="block font-display text-2xl font-bold text-white">{c.title}</span>
+              <span class="mt-1 block text-[0.97rem] text-sky">{c.text}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Moving in (sample) -->
+  <section class="section bg-mist" aria-labelledby="moving">
+    <div class="container-x grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+      <div class="reveal order-2 lg:order-1">
+        <p class="eyebrow">Sample content</p>
+        <h2 id="moving" class="mt-4 text-3xl sm:text-4xl md:text-5xl">Moving in is simple</h2>
+        <ol class="mt-8 space-y-6">
+          {moveSteps.map((s, i) => (
+            <li class="flex gap-4">
+              <span class="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-lake font-display text-xl font-bold text-white">{i + 1}</span>
+              <span>
+                <span class="flex items-center gap-2 font-display text-xl font-bold text-lake"><Icon name={s.icon} class="h-5 w-5" />{s.title}</span>
+                <span class="mt-1 block">{s.text}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+        <a href={href('/vacancies')} class="btn btn-lake mt-8">Browse available homes</a>
+      </div>
+      <div class="reveal order-1 lg:order-2">
+        <img src={img(homePhotos.moving)} alt={homePhotos.moving.alt} width="1000" height="667" loading="lazy" decoding="async" class="aspect-[4/3] w-full rounded-3xl object-cover" style="box-shadow: 0 30px 60px -30px var(--lake)" />
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" aria-labelledby="faq">
+    <div class="container-x grid gap-10 lg:grid-cols-[0.7fr_1.3fr]">
+      <div class="reveal">
+        <h2 id="faq" class="text-3xl sm:text-4xl md:text-5xl">Common questions</h2>
+        <p class="mt-4 text-lg">Quick answers for residents and anyone looking for a home.</p>
+        <a href={phoneHref} class="btn btn-line mt-6"><Icon name="phone" class="h-5 w-5" />Still unsure? Call {managerName}</a>
+      </div>
+      <div class="reveal space-y-3">
+        {faqs.map((f) => (
+          <details class="faq card">
+            <summary>{f.q}</summary>
+            <p class="-mt-1 px-6 pb-6">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Closing call to action -->
+  <section class="on-dark hero-bg relative isolate overflow-hidden text-white" aria-labelledby="cta">
+    <Contours id="cta" class="absolute inset-0 -z-10 h-full w-full" lake={false} cx={1000} cy={220} rings={8} />
+    <div class="container-x py-16 text-center md:py-20">
+      <h2 id="cta" class="mx-auto max-w-3xl text-3xl text-white sm:text-4xl md:text-5xl">What would you like to do?</h2>
+      <p class="mx-auto mt-4 max-w-xl text-lg text-sky">Pay rent, ask for a repair, see a home or just say hello. {managerName} is a call or text away.</p>
+      <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
+        <a href={href('/portal')} class="btn btn-glow"><Icon name="lock" class="h-5 w-5" />Tenant portal</a>
+        <a href={href('/tenants#maintenance')} class="btn btn-line-light"><Icon name="wrench" class="h-5 w-5" />Request maintenance</a>
+        <a href={href('/vacancies')} class="btn btn-line-light"><Icon name="home" class="h-5 w-5" />See available homes</a>
+      </div>
+      <p class="mt-8 text-sky">
+        Or call <a href={phoneHref} class="font-semibold text-glow underline">{site.phone}</a> · <a href={smsHref(`Hi ${managerName}, I have a question.`)} class="font-semibold text-glow underline">send a text</a>
+      </p>
     </div>
   </section>
 </Base>

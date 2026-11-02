@@ -36,9 +36,9 @@ src/
   config/sample.ts        invented sample data (units, rents, photos, payment history)
   components/             SampleGate, SampleBanner, Header, Footer, CallBar, Announcement, Contours,
                           PageHero, Icon, Logo, CopyButton, MaintenanceForm,
-                          PaymentMethods, PayFlow, PhotoSlider, HomeViewer, InquiryForm
+                          PaymentMethods, Portal, PhotoSlider, HomeViewer, InquiryForm
   layouts/Base.astro      head, meta, Open Graph, noindex, skip link
-  pages/                  index, tenants, pay, vacancies, apply, contact, 404, sitemap.xml
+  pages/                  index, tenants, portal, vacancies, contact, 404, sitemap.xml
   styles/global.css       color variables and shared component classes
   styles/gate.css         sample gate card and banner styles (from the Midvora sample kit)
 public/                   favicon.svg, og-image.png, robots.txt, sample/ (stock photos)
@@ -77,7 +77,6 @@ See `.env.example`. Never commit `.env`.
 - `PUBLIC_EMAILJS_PUBLIC_KEY`
 - `PUBLIC_EMAILJS_INQUIRY_TEMPLATE_ID`: separate template for home inquiries and tour requests. Variables sent: `request_type`, `from_name`, `phone`, `unit`, `rent`, `preferred_time`, `message`, `submitted_at`. The template must be created to match (unconfirmed, needs verification).
 - `PUBLIC_VACANCIES_CSV_URL`
-- `PUBLIC_APPLY_FORM_URL`
 - `BASE_PATH`: sub-path when hosted in a folder (GitHub Pages sets it in CI). Empty for a domain root.
 
 `PUBLIC_` values are bundled into the browser build. That is how client side EmailJS works on static hosting. The EmailJS public key is designed to be public, but see the security notes below.
@@ -87,7 +86,6 @@ See `.env.example`. Never commit `.env`.
 - Home: hero, announcements bar, what tenants need to know (who manages, where rent goes, who to call), commitment, next steps.
 - Tenants: mailing instructions with a copy button, optional online payment block (hidden), maintenance form.
 - Vacancies: client side fetch of the published CSV. States: loading, results, empty (also used when no URL is set), error. Empty and error states show Kane's number.
-- Apply: Google Form link when `PUBLIC_APPLY_FORM_URL` is set, otherwise "Call Kane to apply". A privacy note about Social Security numbers always shows.
 - Contact: phone, mailing address, plus email, building addresses and office hours only when set.
 - 404 and `/sitemap.xml` (generated from the nav list).
 
@@ -106,20 +104,25 @@ Before the sample opens, a visitor sees a Midvora card asking for a name and ema
 
 All sample content is invented and labelled "Sample" on the page. Content lives in `src/config/sample.ts`.
 
-### Pay rent (`/pay`)
+### Tenant portal (`/portal`)
 
-`pages/pay.astro` + `components/PayFlow.astro`. A step-by-step flow that runs only in the browser with invented units and rents. Nothing is sent anywhere and no bank or card details are collected (the card fields on the sample checkout are disabled).
+`pages/portal.astro` + `components/Portal.astro`. A fake sign in, create account and dashboard, so Kane can see how tenants would see their rent. It runs only in the browser with invented data. Anything works: any valid email and password sign in, and a new account only needs a name, unit, email and an 8 character password. Nothing is sent or stored on a server, the password is never kept, and the "session" is only a name, email and unit in `sessionStorage` so a refresh keeps the demo going.
 
-1. Your home: name + unit (autofills the sample rent).
-2. How to pay: bank transfer (no fee) or card (2.9% + 30 cents shown up front).
-3. Review, then a sample "secure checkout" screen styled like the page Stripe hosts, then a receipt.
-4. "Autopay and receipts" tab: sample email-code sign in (any 6 digits), autopay switch, saved bank, payment history. This mirrors Stripe's hosted customer portal.
+- Signed out: Sign in / Create account toggle, show or hide password, forgot password note, "Sample only" notice.
+- Dashboard: rent due (from the chosen unit), Pay now, autopay switch, payment history, maintenance requests (invented), and a help column.
+- Pay now: payment method (bank transfer, or card with the 2.9% + 30 cents fee shown up front), review, a sample "secure checkout" styled like the page Stripe hosts (card fields disabled, nothing collected), then a receipt. After paying, the balance shows $0.00 and the payment appears in the history.
 
-Design decision: no custom tenant login. Guest checkout covers paying. Autopay and history would come from Stripe's own email-code portal, so there is no password system to build or secure. A custom portal (balance, ledger) needs a backend and is a later phase or a job for a rent platform.
+Design decision (changed on 2026-11-02): tenants sign in to see and pay their rent. The earlier plan was guest checkout with no login. A real version needs one of: a rent platform portal (TurboTenant, TenantCloud, RentRedi, Avail), or Stripe plus a backend and a database for accounts. A static site cannot keep real accounts. Do not put real passwords or payment details into this sample.
 
-Going live with Stripe (not built): create a Payment Link (ACH + card) with custom fields for unit and name, and replace the checkout step with a link to it. For autopay, create a subscription per tenant and enable the customer portal. Fees and the ACH mandate behavior must be confirmed on Stripe's own pages.
+Going live with Stripe (not built): Payment Links or Checkout for the payment step, subscriptions for autopay, and Stripe's customer portal for self service. Fees and ACH mandate behavior must be confirmed on Stripe's own pages.
 
-The Tenants page links to `/pay` from the "Ways to pay rent" section (`PaymentMethods.astro`). Mail a check remains the live method.
+The Tenants page links to `/portal` from the "Ways to pay rent" section (`PaymentMethods.astro`). Mail a check remains the live method.
+
+### Home page content (sample)
+
+Added sections on `pages/index.astro`: hero with a photo, an at-a-glance strip, featured homes (link to the photo viewer), "A home that is looked after", "Life in Marshall", "Moving in is simple", a FAQ (native `details`), and a closing call to action. The text lives in `config/sample.ts` (`homePhotos`, `residentBenefits`, `lifeInMarshall`, `moveSteps`, `faqs`). Everything except the contact facts, the mailing address and the maintenance and payment steps is invented, and the sections say "Sample". No testimonials, statistics or awards were invented. Confirm real details with Kane before launch.
+
+The Apply page was removed on 2026-11-02 (and `PUBLIC_APPLY_FORM_URL`). Prospective tenants use the vacancies page: text, call, message or request a tour.
 
 ### Vacancies
 
@@ -127,11 +130,11 @@ The Tenants page links to `/pay` from the "Ways to pay rent" section (`PaymentMe
 - `PhotoSlider.astro`: native scroll-snap slider (swipe on touch), previous/next buttons, "n of N" counter, arrow keys, no auto-rotate, no library. Follows the W3C carousel pattern (region, slide groups, native buttons).
 - `HomeViewer.astro`: one native `<dialog>` per home with a large slider, thumbnails, details and contact options. Escape or Close or a click outside closes it and focus returns to the button. `/vacancies#home-3b` opens that home directly, so a link can be texted.
 - Contact options per home: Text Kane (`sms:` link with a prefilled message, `smsHref()` in `site.ts`), Call Kane, a copy-number fallback for computers, and `InquiryForm.astro` (Ask a question or Request a tour; validation in `validateInquiry`, honeypot, 30 second cooldown, sample mode until EmailJS is set).
-- Photos are downloaded into `public/sample/` (12 files), not hot-linked, so the sample cannot break. They are free stock photos from Pexels, which allows use without attribution. Photo IDs: 2A: 1643383, 2062426, 271624, 1457847. 3B: 1571453, 1457842, 2029694, 3144580. 1C: 1571463, 2724748, 1918291, 6585751 (URL pattern `https://www.pexels.com/photo/<id>/`). These are not photos of the real building. Replace them with Kane's own photos.
+- Photos are downloaded into `public/sample/` (18 files), not hot-linked, so the sample cannot break. They are free stock photos from Pexels, which allows use without attribution. Photo IDs: 2A: 1643383, 2062426, 271624, 1457847. 3B: 1571453, 1457842, 2029694, 3144580. 1C: 1571463, 2724748, 1918291, 6585751 Home page photos (`home-*.jpg`): hero 106399, street 259588, lake 247600, autumn road 1563356, moving boxes 4246120, brick home 3555615. URL pattern `https://www.pexels.com/photo/<id>/`. These are not photos of the real building. Replace them with Kane's own photos.
 
 ### Removing the samples
 
-Delete the `data-sample` block in `pages/vacancies.astro`, the `#ways-to-pay` section in `pages/tenants.astro`, `pages/pay.astro`, the "Pay rent" entry in `nav` in `site.ts`, and `public/sample/`.
+Delete the `data-sample` block in `pages/vacancies.astro`, the `#ways-to-pay` section in `pages/tenants.astro`, `pages/portal.astro`, the "Tenant portal" entry in `nav` in `site.ts`, and `public/sample/`.
 
 ### Other changes
 
@@ -182,7 +185,7 @@ The logo mark in the header is a generated SVG placeholder for the sample, not S
 
 ## Deployment
 
-GitHub Actions (`.github/workflows/deploy.yml`) builds and deploys to GitHub Pages on every push to `master` or `main`. The workflow sets `SITE_URL` and `BASE_PATH` from the Pages settings, runs `npm run verify`, then publishes `dist/`. The EmailJS, vacancy and apply values can be set as repository variables with the same names as in `.env.example` (Settings, Secrets and variables, Actions, Variables). They are public by design. Until they are set, the site runs in sample mode. Enabling Pages automatically through the workflow is unconfirmed, needs verification (if the first run fails, set Settings, Pages, Source to GitHub Actions).
+GitHub Actions (`.github/workflows/deploy.yml`) builds and deploys to GitHub Pages on every push to `master` or `main`. The workflow sets `SITE_URL` and `BASE_PATH` from the Pages settings, runs `npm run verify`, then publishes `dist/`. The EmailJS and vacancy values can be set as repository variables with the same names as in `.env.example` (Settings, Secrets and variables, Actions, Variables). They are public by design. Until they are set, the site runs in sample mode. Enabling Pages automatically through the workflow is unconfirmed, needs verification (if the first run fails, set Settings, Pages, Source to GitHub Actions).
 
 ## Checks run on 2026-10-05
 
@@ -203,7 +206,7 @@ GitHub Actions (`.github/workflows/deploy.yml`) builds and deploys to GitHub Pag
 
 - Photo viewer and inquiry form work for the sample homes only. Rows loaded from the Google Sheet still use the simple card from `lib/vacancies.ts`. Next step: add an optional `photos` column (https URLs, comma separated) to the whitelist in `lib/csv.ts`, and render the same slider and viewer for sheet rows.
 - The Stripe checkout, autopay and portal are visual samples. No Stripe account, keys or Payment Links exist yet.
-- `/pay` is in the nav and sitemap. It is also `noindex` like every page of the sample.
+- `/portal` is in the nav and sitemap. It is also `noindex` like every page of the sample.
 - Domain and hosting are undecided. `SITE_URL` defaults to localhost, so the sitemap and Open Graph URLs need it set before sharing.
 - `og-image.png` is a screenshot of the hero, generated once.
 - Rent mailing block uses "Summit Lake Properties" as the addressee. Unconfirmed, needs verification.
@@ -212,6 +215,7 @@ GitHub Actions (`.github/workflows/deploy.yml`) builds and deploys to GitHub Pag
 
 - 2026-11-02: Phone polish: payment cards compact on small screens, bedroom filter fits one row, pay page no longer overflows sideways in the account view, sticky call bar can no longer cover a focused or scrolled-to button (`scroll-padding-bottom`), copy fix on Tenants.
 - 2026-11-02: Added the Midvora sample gate and banner (kit v2.2 Astro variant), replacing the old plain banner.
+- 2026-11-02: Replaced the guest pay page with a fake tenant portal (`/portal`: sign in, create account, dashboard, pay flow), removed the Apply page, and added sample home page content and photos.
 - 2026-11-02: Added the `/pay` sample flow (Stripe style checkout, receipt, autopay and history), vacancy photo sliders with a full screen viewer, text / call / inquiry / tour request options, and a "Pay rent" nav item.
 - 2026-11-02: Added sample "Ways to pay" section and sample vacancy listings (see Design samples).
 - 2026-10-05: Added base path support and the GitHub Pages deploy workflow.

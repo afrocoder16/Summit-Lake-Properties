@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Portal from '../components/Portal.astro';
+import Icon from '../components/Icon.astro';
+import { site, managerName } from '../config/site';
+---
+<Base title="Tenant portal" description={`Sign in to the ${site.name} tenant portal to see your rent, pay online, set up autopay and track maintenance requests. Questions? Contact ${managerName}.`}>
+  <PageHero id="portal" eyebrow="Tenant portal" title="Your rent, in one place" lead="Sign in to see what is due, pay online, turn on autopay and follow your maintenance requests.">
+    <p class="mt-6 inline-flex items-center gap-2 text-sky"><Icon name="lock" class="h-5 w-5" />Payments are handled by Stripe. We never see your bank or card details.</p>
+  </PageHero>
+
+  <section class="section" aria-label="Tenant portal">
+    <div class="container-x">
+      <Portal />
+    </div>
+  </section>
+</Base>

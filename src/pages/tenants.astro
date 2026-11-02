@@ -17,7 +17,7 @@ const showOnline = site.features.onlineRentPayment && site.onlinePaymentUrl;
     </div>
   </PageHero>
 
-  <!-- Design sample: ways to pay. Remove this section and PayPreview to go back to mail only. -->
+  <!-- Design sample: ways to pay. Remove this section to go back to mail only. -->
   <section id="ways-to-pay" class="section pb-0 md:pb-0" aria-labelledby="ways-title">
     <div class="container-x">
       <div class="grid items-start gap-10 lg:grid-cols-[1.1fr_0.9fr]">
@@ -29,14 +29,14 @@ const showOnline = site.features.onlineRentPayment && site.onlinePaymentUrl;
         </div>
         <div class="card-mist p-7 md:p-9">
           <span class="grid h-14 w-14 place-items-center rounded-2xl bg-glow text-ink"><Icon name="lock" class="h-7 w-7" /></span>
-          <h3 class="mt-5 text-2xl sm:text-3xl">See how online payment will work</h3>
-          <p class="mt-3 text-lg">Try the sample pay screen: pick a home, choose bank transfer or card, and see the receipt. Nothing is charged and no details are collected.</p>
+          <h3 class="mt-5 text-2xl sm:text-3xl">Your tenant portal</h3>
+          <p class="mt-3 text-lg">Sign in to see your rent, pay online and follow your maintenance requests. Try the sample portal: any email and password work, and nothing is stored or charged.</p>
           <ul class="mt-5 space-y-2">
-            <li class="flex gap-3"><Icon name="check" class="mt-1 h-5 w-5 shrink-0 text-shore" />No account or password to pay</li>
-            <li class="flex gap-3"><Icon name="check" class="mt-1 h-5 w-5 shrink-0 text-shore" />Optional autopay and receipts</li>
+            <li class="flex gap-3"><Icon name="check" class="mt-1 h-5 w-5 shrink-0 text-shore" />See what is due and your payment history</li>
+            <li class="flex gap-3"><Icon name="check" class="mt-1 h-5 w-5 shrink-0 text-shore" />Pay by bank transfer or card, or turn on autopay</li>
             <li class="flex gap-3"><Icon name="check" class="mt-1 h-5 w-5 shrink-0 text-shore" />Bank and card details stay with Stripe</li>
           </ul>
-          <a href={href('/pay')} class="btn btn-lake mt-7 w-full sm:w-auto">Try the sample pay screen</a>
+          <a href={href('/portal')} class="btn btn-lake mt-7 w-full sm:w-auto">Try the sample tenant portal</a>
         </div>
       </div>
     </div>

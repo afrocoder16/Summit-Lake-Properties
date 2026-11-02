@@ -120,6 +120,14 @@
   .switch > span { @apply block h-6 w-6 translate-x-1 rounded-full bg-white transition; box-shadow: 0 1px 4px rgb(0 0 0 / 0.3); }
   .switch[aria-checked='true'] > span { @apply translate-x-7; }
 
+  /* FAQ accordion built on native details/summary. */
+  .faq summary { @apply flex min-h-[64px] cursor-pointer list-none items-center justify-between gap-4 rounded-3xl px-6 py-4 font-display text-lg font-bold text-lake; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; @apply grid h-9 w-9 shrink-0 place-items-center rounded-full bg-mist text-2xl font-normal leading-none text-lake transition; }
+  .faq[open] summary::after { content: '\2212'; @apply bg-lake text-white; }
+  .faq summary:hover { @apply bg-mist; }
+  .faq[open] summary:hover { background: transparent; }
+
   /* Two option toggle built from radio inputs. */
   .segment { @apply flex min-h-[44px] cursor-pointer items-center justify-center rounded-full px-3 text-center text-[0.95rem] font-semibold text-lake transition; }
   .segment:has(:checked) { @apply bg-lake text-white; }

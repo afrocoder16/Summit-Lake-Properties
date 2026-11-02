@@ -17,7 +17,6 @@ const httpsUrl = (v: string | undefined) => {
 
 export const env = {
   vacanciesCsvUrl: httpsUrl(import.meta.env.PUBLIC_VACANCIES_CSV_URL),
-  applyFormUrl: httpsUrl(import.meta.env.PUBLIC_APPLY_FORM_URL),
   emailjs: {
     serviceId: clean(import.meta.env.PUBLIC_EMAILJS_SERVICE_ID),
     templateId: clean(import.meta.env.PUBLIC_EMAILJS_TEMPLATE_ID),

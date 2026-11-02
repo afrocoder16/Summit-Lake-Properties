@@ -93,8 +93,7 @@ export const href = (path: string) => {
 export const nav = [
   { label: 'Home', href: '/' },
   { label: 'Tenants', href: '/tenants' },
-  { label: 'Pay rent', href: '/pay' },
+  { label: 'Tenant portal', href: '/portal' },
   { label: 'Vacancies', href: '/vacancies' },
-  { label: 'Apply', href: '/apply' },
   { label: 'Contact', href: '/contact' },
 ] as const;
